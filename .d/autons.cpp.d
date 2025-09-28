@@ -671,7 +671,7 @@ bin/autons.cpp.o: src/autons.cpp include/autons.h \
  include/pros/motors.hpp include/pros/optical.hpp include/pros/optical.h \
  include/pros/rotation.hpp include/pros/rtos.hpp include/pros/screen.hpp \
  include/pros/screen.h include/pros/vision.hpp include/pros/vision.h \
- include/lemlib/api.hpp include/lemlib/util.hpp \
+ include/movement.h include/lemlib/api.hpp include/lemlib/util.hpp \
  include/lemlib/logger/logger.hpp include/fmt/core.h include/fmt/format.h \
  include/fmt/core.h include/fmt/format-inl.h \
  include/lemlib/logger/baseSink.hpp include/fmt/args.h \
@@ -1428,6 +1428,7 @@ include/pros/screen.hpp:
 include/pros/screen.h:
 include/pros/vision.hpp:
 include/pros/vision.h:
+include/movement.h:
 include/lemlib/api.hpp:
 include/lemlib/util.hpp:
 include/lemlib/logger/logger.hpp:

@@ -1,9 +1,10 @@
-bin/robotConfigs.cpp.o: src/robotConfigs.cpp include/main.h include/api.h \
- include/pros/adi.h include/pros/ai_vision.h include/pros/colors.h \
- include/pros/device.h include/pros/distance.h include/pros/error.h \
- include/pros/ext_adi.h include/pros/adi.h include/pros/adi.h \
- include/pros/gps.h include/pros/imu.h include/pros/link.h \
- include/pros/llemu.h include/liblvgl/llemu.h include/liblvgl/lvgl.h \
+bin/movement.cpp.o: src/movement.cpp include/movement.h \
+ include/robotConfigs.h include/main.h include/api.h include/pros/adi.h \
+ include/pros/ai_vision.h include/pros/colors.h include/pros/device.h \
+ include/pros/distance.h include/pros/error.h include/pros/ext_adi.h \
+ include/pros/adi.h include/pros/adi.h include/pros/gps.h \
+ include/pros/imu.h include/pros/link.h include/pros/llemu.h \
+ include/liblvgl/llemu.h include/liblvgl/lvgl.h \
  include/liblvgl/lv_version.h include/liblvgl/lvgl_private.h \
  include/liblvgl/core/lv_global.h \
  include/liblvgl/core/../lv_conf_internal.h \
@@ -676,7 +677,9 @@ bin/robotConfigs.cpp.o: src/robotConfigs.cpp include/main.h include/api.h \
  include/fmt/format-inl.h include/lemlib/logger/baseSink.hpp \
  include/fmt/args.h include/lemlib/logger/message.hpp \
  include/lemlib/logger/infoSink.hpp \
- include/lemlib/logger/telemetrySink.hpp include/pros/distance.hpp
+ include/lemlib/logger/telemetrySink.hpp
+include/movement.h:
+include/robotConfigs.h:
 include/main.h:
 include/api.h:
 include/pros/adi.h:
@@ -1439,4 +1442,3 @@ include/fmt/args.h:
 include/lemlib/logger/message.hpp:
 include/lemlib/logger/infoSink.hpp:
 include/lemlib/logger/telemetrySink.hpp:
-include/pros/distance.hpp:

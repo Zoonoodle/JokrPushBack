@@ -10,6 +10,15 @@
 pros::Rotation vertical_encoder(-15);
 pros::Imu imu(19);
 pros::Distance bottomDist(4);
+pros::Distance backDist(6);
+
+// Additional distance sensors for new movement system
+pros::Distance frontDistLeft(7);   // Adjust port numbers as needed
+pros::Distance frontDistRight(8);  
+pros::Distance rightDist(9);
+pros::Distance leftDist(5);
+pros::Optical topOptical(10);
+
 //motors
 pros::MotorGroup left_motors({-12, -13, 14}, pros::MotorGearset::blue);
 pros::MotorGroup right_motors({18, 16,-17}, pros::MotorGearset::blue);
@@ -25,24 +34,24 @@ pros::adi::DigitalOut hoard('G');
 pros::adi::DigitalOut doink('H');
 pros::adi::DigitalOut park('D');
 
-lemlib::ControllerSettings lateral(7, // proportional gain (kP)
+lemlib::ControllerSettings lateral(6.7, // proportional gain (kP)
     0, // integral gain (kI)
-    26 , // derivative gain (kD)
+    27 , // derivative gain (kD)
     0, // anti windup
-    0.5, // small error range, in inches
-    150, // small error range timeout, in milliseconds
-    5, // large error range, in inches
-    300, // large error range timeout, in milliseconds
+    .5, // small error range, in inches
+    100, // small error range timeout, in milliseconds
+    1, // large error range, in inches
+    600, // large error range timeout, in milliseconds
     0);
   
 
 										  
-    lemlib::ControllerSettings angular(3.0, // proportional gain (kP)
+    lemlib::ControllerSettings angular(1.75, // proportional gain (kP)
       0, // integral gain (kI)
-      14, // derivative gain (kD)
+      12, // derivative gain (kD)
       0, // anti windup
-      0.5, // small error range, in inches
-      150, // small error range timeout, in milliseconds
+      1, // small error range, in inches
+      100, // small error range timeout, in milliseconds
       5, // large error range, in inches
       300, // large error range timeout, in milliseconds
       0 // maximum acceleration (slew)

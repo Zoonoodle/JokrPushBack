@@ -34,6 +34,9 @@ void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
     
+    // Start the unjam task but suspend it initially
+    // It will be resumed when autonomous starts
+    unjam_task->suspend();
     
     // Create screen display task as a global task that persists
     screen_task = new pros::Task([=]() {
@@ -76,13 +79,23 @@ void competition_initialize() {}
  * for non-competition testing purposes.
  *
  * If the robot is disabled or communications is lost, the autonomous task
- * will be stopped. Re-enabling the robot will restart the task, not re-start it
+ * will be stopped. Re-enabling the	 robot will restart the task, not re-start it
  * from where it left off.
  */
 void autonomous() {
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-	PIDtune();
+	unjam_task->resume();
+	// elimsMidRush();
+	// Example: Move using front sensors to 300mm distance
+	// moveF(300, false, false, 70, 3000);  // 300mm target, backwards, increasing distance, 70 speed, 3s timeout
+	// chassis.turnToHeading(90, 500);
+	// chassis.turnToHeading(0, 500);
+	// chassis.moveToPoint(0, 24, 1000);
+	// chassis.moveToPoint(0, 0, 1000, {.forwards = false});
+		
+	// chassis.moveToPoint(0, 0, 900, {.forwards = false});
 }
+
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -98,6 +111,7 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	skills();
 	static bool doinkPressed = false;
 	static bool parkPressed = false;
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
