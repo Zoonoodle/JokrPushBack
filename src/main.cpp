@@ -114,7 +114,7 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	skillsOwen();
+	stopUntilScored(3);
 	unjam_task->remove();
 
 	

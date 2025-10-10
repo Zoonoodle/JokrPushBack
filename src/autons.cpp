@@ -185,21 +185,53 @@ void skillsOwen(){
     rest();
     chassis.turnToHeading(205, 500);
     load();
-    chassis.moveToPoint(-30, 2, 1500, {.maxSpeed = 65});
+    chassis.moveToPoint(-31, 0, 1500, {.maxSpeed = 70});
+    chassis.waitUntil(30);
+    doink.set_value(true);
     
     chassis.turnToHeading(234, 400);
     chassis.moveToPoint(-6.7, 27, 1000, {.forwards = false});
-    chassis.turnToHeading(90, 450);
+    chassis.turnToHeading(93, 450);
+    doink.set_value(false);
     chassis.moveToPoint(-22,30,1000,{.forwards = false, .minSpeed = 40});
     chassis.waitUntil(12);
-    unload();
-    chassis.waitUntilDone();
-    left_motors.move(-30);
-    right_motors.move(-30);
-    pros::delay(1000);
-    left_motors.move(0);
-    right_motors.move(0);
+   
+    stopUntilScored(2);
   
+
+    chassis.moveToPoint(-12, chassis.getPose().y, 650, {.earlyExitRange = 5});
+ 
+  
+chassis.turnToHeading(205, 500);
+rest();
+chassis.moveToPoint(-27, 4, 600, {.earlyExitRange = 8});
+
+chassis.swingToHeading(270,DriveSide::RIGHT,500, {.earlyExitRange = 8});
+load();
+chassis.moveToPoint(-60, 5.5, 600, {.earlyExitRange = 10});
+chassis.moveToPoint(-81.55, 6, 1000, {.maxSpeed = 85});
+chassis.waitUntil(12);
+doink.set_value(true);
+chassis.turnToHeading(180, 400);
+chassis.waitUntilDone();
+moveF(1010, false, false, 75, 800);
+chassis.turnToHeading(320, 550);
+rest();
+
+// chassis.moveToPoint(-64.2, -7, 1800, {.forwards = false, .maxSpeed = 70});
+extake();
+pros::delay(350);
+rest();
+chassis.waitUntilDone();
+
+rest();
+moveB(169, false, true, 90, 2000);
+middleScore();
+pros::delay(500);
+rest();
+pros::delay(100);
+middleScore();
+pros::delay(1800);
 }   
 
 

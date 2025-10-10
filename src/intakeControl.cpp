@@ -281,8 +281,8 @@ void unload() {
 }
 void slowUnload() {
     hoard.set_value(false);
-    intakeBottom.move(127);
-    intakeTop.move(-70);
+    intakeBottom.move(100);
+    intakeTop.move(-100);
     intakeOn = true;  // Intake is running during unload
 }
 void middleScore() {
@@ -389,23 +389,35 @@ bool isUnjamEnabled() {
 // Index/score control function - runs intake until specified number of balls scored
 void stopUntilScored(int ballsToScore) {
     // Start scoring - intake motors run to eject balls
-    unload();
+    slowUnload();
     
     int scoredCount = 0;
     
     // Threshold values for optical sensor
     // Note: Optical sensor uses proximity - higher values mean closer/ball present
-    const int BALL_PRESENT_THRESHOLD = 50;  // Proximity when ball is present
-    const int DEBOUNCE_MS = 50;  // Minimum time for stable reading
+    const int BALL_PRESENT_THRESHOLD = 70;  // Higher threshold for better ball detection
+    const int BALL_ABSENT_THRESHOLD = 40;   // Lower threshold to confirm ball has left
+    const int DEBOUNCE_MS = 30;  // Debounce time for stable reading
+    const int MIN_BALL_GAP_MS = 100;  // Minimum time between ball counts (prevents double-counting)
     const int SAMPLE_DELAY = 5;  // Delay between sensor samples
     
     // State tracking for edge detection
     bool ballWasPresent = false;
+    int lastBallCountTime = 0;  // Track when we last counted a ball
     
     while (scoredCount < ballsToScore) {
         // Get current sensor reading
         int currentReading = topOptical.get_proximity();
-        bool ballIsPresent = currentReading > BALL_PRESENT_THRESHOLD;
+        
+        // Use hysteresis: different thresholds for detecting vs losing ball
+        bool ballIsPresent;
+        if (ballWasPresent) {
+            // Ball was present, use lower threshold to detect when it leaves
+            ballIsPresent = currentReading > BALL_ABSENT_THRESHOLD;
+        } else {
+            // No ball detected, use higher threshold to detect new ball
+            ballIsPresent = currentReading > BALL_PRESENT_THRESHOLD;
+        }
         
         // Debounce check - ensure stable reading for DEBOUNCE_MS
         if (ballIsPresent != ballWasPresent) {
@@ -415,7 +427,14 @@ void stopUntilScored(int ballsToScore) {
             
             while (pros::millis() - stableReadingStart < DEBOUNCE_MS) {
                 int newReading = topOptical.get_proximity();
-                bool newBallPresent = newReading > BALL_PRESENT_THRESHOLD;
+                bool newBallPresent;
+                
+                // Apply same hysteresis logic during debounce
+                if (ballWasPresent) {
+                    newBallPresent = newReading > BALL_ABSENT_THRESHOLD;
+                } else {
+                    newBallPresent = newReading > BALL_PRESENT_THRESHOLD;
+                }
                 
                 if (newBallPresent != ballIsPresent) {
                     // Reading changed during debounce period, restart
@@ -428,10 +447,15 @@ void stopUntilScored(int ballsToScore) {
             
             if (isStable) {
                 // Stable state change detected
+                int currentTime = pros::millis();
+                
                 if (!ballIsPresent && ballWasPresent) {
                     // Falling edge - ball just left sensor range
-                    // This means a ball was scored/ejected
-                    scoredCount++;
+                    // Only count if enough time has passed since last ball (prevents double-counting)
+                    if (currentTime - lastBallCountTime >= MIN_BALL_GAP_MS) {
+                        scoredCount++;
+                        lastBallCountTime = currentTime;
+                    }
                 }
                 
                 ballWasPresent = ballIsPresent;
