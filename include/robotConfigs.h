@@ -15,12 +15,12 @@ extern pros::Motor intakeTop;
 extern pros::Motor intakeBottom;
 extern pros::Distance bottomDist;
 extern pros::Distance backDist;
+extern pros::Distance frontDist;
 
 // Additional distance sensors
-extern pros::Distance frontDistLeft;
-extern pros::Distance frontDistRight;
-extern pros::Distance rightDist;
-extern pros::Distance leftDist;
+
+
+
 extern pros::Optical topOptical;
 //tracking stuff
 extern pros::Rotation vertical_encoder;

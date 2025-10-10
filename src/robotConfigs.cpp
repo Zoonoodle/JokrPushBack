@@ -10,7 +10,8 @@
 pros::Rotation vertical_encoder(-15);
 pros::Imu imu(19);
 pros::Distance bottomDist(4);
-pros::Distance backDist(6);
+pros::Distance backDist(11);
+pros::Distance frontDist(2);
 
 // Additional distance sensors for new movement system
 pros::Distance frontDistLeft(7);   // Adjust port numbers as needed
@@ -41,19 +42,19 @@ lemlib::ControllerSettings lateral(6.7, // proportional gain (kP)
     .5, // small error range, in inches
     100, // small error range timeout, in milliseconds
     1, // large error range, in inches
-    600, // large error range timeout, in milliseconds
+    700, // large error range timeout, in milliseconds
     0);
   
 
 										  
-    lemlib::ControllerSettings angular(1.75, // proportional gain (kP)
+    lemlib::ControllerSettings angular(1.76, // proportional gain (kP)
       0, // integral gain (kI)
       12, // derivative gain (kD)
       0, // anti windup
-      1, // small error range, in inches
-      100, // small error range timeout, in milliseconds
-      5, // large error range, in inches
-      300, // large error range timeout, in milliseconds
+      .5, // small error range, in inches
+      150, // small error range timeout, in milliseconds
+      3, // large error range, in inches
+      600, // large error range timeout, in milliseconds
       0 // maximum acceleration (slew)
 );
 

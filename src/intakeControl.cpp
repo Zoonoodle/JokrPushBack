@@ -18,7 +18,7 @@ pros::Task* unjam_task = new pros::Task([]() {
     const int STALL_VELOCITY_THRESHOLD = 5;  // RPM - motor essentially stopped
     const int STALL_TIME_MS = 300;  // Must be stalled for 300ms continuously
     const int UNJAM_COOLDOWN_MS = 2000;  // 2 second cooldown between unjams
-    const int MIN_TARGET_SPEED = 50;  // Only check if commanding significant movement
+    const int MIN_VOLTAGE_THRESHOLD = 6000;  // Only check if commanding significant movement (mV)
     
     // Run continuously
     while (true) {
@@ -27,11 +27,13 @@ pros::Task* unjam_task = new pros::Task([]() {
             // Get current bottom motor velocity (absolute value)
             double bottomVel = std::abs(intakeBottom.get_actual_velocity());
             
-            // Get commanded speed for bottom motor
-            double bottomTarget = std::abs(intakeBottom.get_target_velocity());
+            // Get commanded voltage/power for bottom motor
+            // Note: Since we use .move() not .move_velocity(), check voltage instead
+            int32_t bottomVoltage = std::abs(intakeBottom.get_voltage());
             
             // Only check for jam if we're commanding significant movement
-            if (bottomTarget > MIN_TARGET_SPEED) {
+            // 6000mV = about 50% power (127 * 12V / 2 = ~6V)
+            if (bottomVoltage > MIN_VOLTAGE_THRESHOLD) {
                 // Check if motor is essentially stopped (true jam)
                 bool isStalled = bottomVel < STALL_VELOCITY_THRESHOLD;
                 
@@ -51,9 +53,9 @@ pros::Task* unjam_task = new pros::Task([]() {
                             bool canUnjam = (currentTime - lastUnjamTime) > UNJAM_COOLDOWN_MS;
                             
                             if (canUnjam) {
-                                // Save current motor speeds
-                                savedBottomSpeed = intakeBottom.get_target_velocity();
-                                savedTopSpeed = intakeTop.get_target_velocity();
+                                // Save current motor voltage (since we use .move(), not .move_velocity())
+                                savedBottomSpeed = intakeBottom.get_voltage() / 12000.0 * 127.0;  // Convert mV to -127..127
+                                savedTopSpeed = intakeTop.get_voltage() / 12000.0 * 127.0;
                                 
                                 // ONLY reverse bottom motor to unjam
                                 // Top motor continues normal operation
@@ -96,9 +98,6 @@ void doublePark() {
     intakeOn = true;  // Intake is running during park sequence
     while(bottomDist.get() > 200) {
         intakeBottom.move(-127);
-    }
-    while(bottomDist.get() < 220){
-        intakeBottom.move(-80);
     }
     pros::delay(100);
     intakeBottom.move(0);
@@ -287,8 +286,9 @@ void slowUnload() {
     intakeOn = true;  // Intake is running during unload
 }
 void middleScore() {
+    hoard.set_value(false);
     intakeBottom.move(127);
-    intakeTop.move(75);
+    intakeTop.move(85);
     intakeOn = true;  // Intake is running during scoring
 }
 void slowMiddleScore() {
@@ -384,4 +384,64 @@ void disableUnjam() {
 
 bool isUnjamEnabled() {
     return unjamEnabled;
+}
+
+// Index/score control function - runs intake until specified number of balls scored
+void stopUntilScored(int ballsToScore) {
+    // Start scoring - intake motors run to eject balls
+    unload();
+    
+    int scoredCount = 0;
+    
+    // Threshold values for optical sensor
+    // Note: Optical sensor uses proximity - higher values mean closer/ball present
+    const int BALL_PRESENT_THRESHOLD = 50;  // Proximity when ball is present
+    const int DEBOUNCE_MS = 50;  // Minimum time for stable reading
+    const int SAMPLE_DELAY = 5;  // Delay between sensor samples
+    
+    // State tracking for edge detection
+    bool ballWasPresent = false;
+    
+    while (scoredCount < ballsToScore) {
+        // Get current sensor reading
+        int currentReading = topOptical.get_proximity();
+        bool ballIsPresent = currentReading > BALL_PRESENT_THRESHOLD;
+        
+        // Debounce check - ensure stable reading for DEBOUNCE_MS
+        if (ballIsPresent != ballWasPresent) {
+            // State might be changing, wait for stable reading
+            int stableReadingStart = pros::millis();
+            bool isStable = true;
+            
+            while (pros::millis() - stableReadingStart < DEBOUNCE_MS) {
+                int newReading = topOptical.get_proximity();
+                bool newBallPresent = newReading > BALL_PRESENT_THRESHOLD;
+                
+                if (newBallPresent != ballIsPresent) {
+                    // Reading changed during debounce period, restart
+                    isStable = false;
+                    break;
+                }
+                
+                pros::delay(SAMPLE_DELAY);
+            }
+            
+            if (isStable) {
+                // Stable state change detected
+                if (!ballIsPresent && ballWasPresent) {
+                    // Falling edge - ball just left sensor range
+                    // This means a ball was scored/ejected
+                    scoredCount++;
+                }
+                
+                ballWasPresent = ballIsPresent;
+            }
+        }
+        
+        // Small delay between checks
+        pros::delay(SAMPLE_DELAY);
+    }
+    
+    // All balls scored, stop the intake
+    rest();
 }

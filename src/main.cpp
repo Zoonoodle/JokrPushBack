@@ -46,6 +46,8 @@ void initialize() {
             pros::lcd::print(1, "Y: %.2f", chassis.getPose().y); // y
             pros::lcd::print(2, "Theta: %.2f", chassis.getPose().theta); // heading
             // delay to save resources
+			pros::lcd::print(3, "Front: %.2f", frontDist.get());
+			pros::lcd::print(4, "Back: %.2f", backDist.get());
             pros::delay(50);
         }
     });
@@ -84,14 +86,15 @@ void competition_initialize() {}
  */
 void autonomous() {
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-	unjam_task->resume();
+	unjam_task->resume();  // Resume unjam task for autonomous
+	skillsOwen();
+// SigSawp();
 	// elimsMidRush();
 	// Example: Move using front sensors to 300mm distance
 	// moveF(300, false, false, 70, 3000);  // 300mm target, backwards, increasing distance, 70 speed, 3s timeout
-	// chassis.turnToHeading(90, 500);
-	// chassis.turnToHeading(0, 500);
-	// chassis.moveToPoint(0, 24, 1000);
-	// chassis.moveToPoint(0, 0, 1000, {.forwards = false});
+
+	// chassis.moveToPoint(0, 24, 2000);
+	// chassis.moveToPoint(0, 0, 2000, {.forwards = false});
 		
 	// chassis.moveToPoint(0, 0, 900, {.forwards = false});
 }
@@ -111,7 +114,11 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	skills();
+	skillsOwen();
+	unjam_task->remove();
+
+	
+
 	static bool doinkPressed = false;
 	static bool parkPressed = false;
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
@@ -139,7 +146,7 @@ void opcontrol() {
 		}
 		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
 			intakeBottom.move(127);
-			intakeTop.move(70);
+			intakeTop.move(127);
 		}
 		else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
 				intakeBottom.move(-127);
@@ -162,7 +169,9 @@ void opcontrol() {
 				wingsPressed = false;
 			}
 		}
-		
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+			slowMiddleScore();
+		}
 		// Handle doink toggle
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
 			doinkPressed = !doinkPressed;

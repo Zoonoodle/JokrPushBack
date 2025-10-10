@@ -37,4 +37,7 @@ extern bool scoreBallsAuto(int ballCount, int timeoutMs = 5000);
 extern pros::Task* scoreBallsAsync(int ballCount, int timeoutMs = 5000);
 extern bool middleScoreAuto(int ballCount, int timeoutMs = 5000);
 extern pros::Task* middleScoreAsync(int ballCount, int timeoutMs = 5000);
+
+// Index/score control function - runs intake until specified number of balls scored
+extern void stopUntilScored(int ballsToScore);
 #endif
