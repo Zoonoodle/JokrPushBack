@@ -38,6 +38,9 @@ void initialize() {
     // It will be resumed when autonomous starts
     unjam_task->suspend();
     
+    // Suspend doublePark task initially - will be resumed when button pressed
+    doublePark->suspend();
+    
     // Create screen display task as a global task that persists
     screen_task = new pros::Task([=]() {
         while (true) {
@@ -87,7 +90,7 @@ void competition_initialize() {}
 void autonomous() {
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
 	unjam_task->resume();  // Resume unjam task for autonomous
-	skillsOwen();
+	SigSawp();
 // SigSawp();
 	// elimsMidRush();
 	// Example: Move using front sensors to 300mm distance
@@ -114,13 +117,18 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	stopUntilScored(3);
+
 	unjam_task->remove();
 
 	
-
+gatePressed = false;
+	static bool doubleParkReady = false;
 	static bool doinkPressed = false;
 	static bool parkPressed = false;
+	static bool gatePressed = false;
+	static bool wingsPressed = false;
+	static int lastGateToggleTime = 0;
+	
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	while (true) {
 		int leftY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
@@ -141,17 +149,26 @@ void opcontrol() {
 
 		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
 			intakeBottom.move(127);
-			intakeTop.move(-30);
+			intakeTop.move(-60);
 			hoard.set_value(true);
 		}
 		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
 			intakeBottom.move(127);
 			intakeTop.move(127);
 		}
+		
 		else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+			if (!doubleParkReady) {
 				intakeBottom.move(-127);
 				intakeTop.move(127);
 			}
+			else if(doubleParkReady && (pros::millis() - lastGateToggleTime) > 450) {
+				gatePressed = !gatePressed;
+				gate.set_value(gatePressed);
+				lastGateToggleTime = pros::millis();
+			}
+		}
+			
 		else {
 			intakeBottom.move(0);
 			intakeTop.move(0);
@@ -179,14 +196,18 @@ void opcontrol() {
 		}
 
 		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-			parkPressed = !parkPressed;
-			if (parkPressed) {
-				doublePark();
-			} else {
+			if(!gatePressed) {
+				doubleParkReady = true;
+			}
+			else {	
+				parkPressed = !parkPressed;
 				park.set_value(parkPressed);
 			}
 		}
 
+		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
+			doubleParkReady = false;
+		}
 		pros::delay(20);          // Run for 20 ms then update
 	}
 }

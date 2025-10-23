@@ -16,13 +16,13 @@ pros::Distance frontDist(2);
 // Additional distance sensors for new movement system
 pros::Distance frontDistLeft(7);   // Adjust port numbers as needed
 pros::Distance frontDistRight(8);  
-pros::Distance rightDist(9);
+
 pros::Distance leftDist(5);
 pros::Optical topOptical(10);
 
 //motors
 pros::MotorGroup left_motors({-12, -13, 14}, pros::MotorGearset::blue);
-pros::MotorGroup right_motors({18, 16,-17}, pros::MotorGearset::blue);
+pros::MotorGroup right_motors({9, 16,-17}, pros::MotorGearset::blue);
 
 pros::Motor intakeTop(-21, pros::MotorGearset::blue);
 pros::Motor intakeBottom(-20, pros::MotorGearset::blue);
@@ -30,10 +30,11 @@ pros::Motor intakeBottom(-20, pros::MotorGearset::blue);
 lemlib::TrackingWheel vertical(&vertical_encoder, lemlib::Omniwheel::NEW_2, 0); // Adjust this offset based on your robot's geometry
 
 //pneumatics
+pros::adi::DigitalOut gate('G');
 pros::adi::DigitalOut wings('E');
-pros::adi::DigitalOut hoard('G');
-pros::adi::DigitalOut doink('H');
-pros::adi::DigitalOut park('D');
+pros::adi::DigitalOut hoard('D');
+pros::adi::DigitalOut doink('F'); 
+pros::adi::DigitalOut park('H');
 
 lemlib::ControllerSettings lateral(6.7, // proportional gain (kP)
     0, // integral gain (kI)

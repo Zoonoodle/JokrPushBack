@@ -1,0 +1,48 @@
+# Build artifacts
+bin/
+*.o
+*.a
+*.lib
+*.elf
+*.bin
+
+# Compiled Object files
+*.slo
+*.lo
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+
+# Executables
+*.exe
+*.out
+*.app
+
+# IDE files
+.vscode/
+.vs/
+*.code-workspace
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Logs
+*.log
+
+# PROS specific
+compile_commands.json
+.pros/
+

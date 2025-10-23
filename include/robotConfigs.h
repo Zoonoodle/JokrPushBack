@@ -29,6 +29,7 @@ extern lemlib::TrackingWheel vertical;
 extern lemlib::OdomSensors sensors;
 
 //pneumatics
+extern pros::adi::DigitalOut gate;
 extern pros::adi::DigitalOut wings;
 extern pros::adi::DigitalOut hoard;
 extern pros::adi::DigitalOut doink;

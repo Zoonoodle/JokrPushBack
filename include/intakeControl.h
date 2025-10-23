@@ -6,7 +6,8 @@
 #include "pros/motors.hpp"
 #include "pros/adi.hpp"
 
-extern void doublePark();
+extern bool gatePressed;
+extern pros::Task* doublePark;
 extern void load();
 extern void unload();
 extern void middleScore();

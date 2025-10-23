@@ -2,6 +2,7 @@
 #include "robotConfigs.h"
 bool isDone;
 bool intakeOn;
+bool gatePressed = false;
 bool unjamEnabled = true;  // Flag to enable/disable unjam feature (default enabled)
 
 // Global variables for jam detection
@@ -94,85 +95,23 @@ pros::Task* unjam_task = new pros::Task([]() {
 
 
 
-void doublePark() {
-    intakeOn = true;  // Intake is running during park sequence
-    while(bottomDist.get() > 200) {
-        intakeBottom.move(-127);
-    }
-    pros::delay(100);
-    intakeBottom.move(0);
-    pros::delay(300);
-    intakeOn = false;  // Intake stopped
-    park.set_value(true);
-}
-    bool firstStageCounted(int count, int timeoutMs) {
-        int currentCount = 0;
-        int startTime = pros::millis();
-        
-        // Threshold values - adjust based on testing
-        const int BALL_PRESENT_THRESHOLD = 229;  // Distance when ball is present (lower values)
-        const int DEBOUNCE_MS = 50;  // Minimum time for stable reading
-        const int SAMPLE_DELAY = 5;  // Delay between sensor samples
-        
-        // State tracking for edge detection
-        bool ballWasPresent = false;
-        int lastStateChangeTime = pros::millis();
-        
-        while (currentCount < count) {
-            // Check for timeout
-            if (pros::millis() - startTime > timeoutMs) {
-                return false;  // Timeout - balls didn't come in time
-            }
-            
-            // Get current sensor reading
-            int currentReading = bottomDist.get();
-            bool ballIsPresent = currentReading < BALL_PRESENT_THRESHOLD;
-            
-            // Debounce check - ensure stable reading for DEBOUNCE_MS
-            if (ballIsPresent != ballWasPresent) {
-                // State might be changing, wait for stable reading
-                int stableReadingStart = pros::millis();
-                bool isStable = true;
-                
-                while (pros::millis() - stableReadingStart < DEBOUNCE_MS) {
-                    if (pros::millis() - startTime > timeoutMs) {
-                        return false;  // Timeout during debounce
-                    }
-                    
-                    int newReading = bottomDist.get();
-                    bool newBallPresent = newReading < BALL_PRESENT_THRESHOLD;
-                    
-                    if (newBallPresent != ballIsPresent) {
-                        // Reading changed during debounce period, restart
-                        isStable = false;
-                        break;
-                    }
-                    
-                    pros::delay(SAMPLE_DELAY);
-                }
-                
-                if (isStable) {
-                    // Stable state change detected
-                    if (ballIsPresent && !ballWasPresent) {
-                        // Rising edge - ball just entered sensor range
-                        // Don't count yet, wait for it to pass through
-                    } else if (!ballIsPresent && ballWasPresent) {
-                        // Falling edge - ball just left sensor range
-                        // This means a ball passed through completely
-                        currentCount++;
-                    }
-                    
-                    ballWasPresent = ballIsPresent;
-                    lastStateChangeTime = pros::millis();
-                }
-            }
-            
-            // Allow intake motors to run
-            pros::delay(SAMPLE_DELAY);
+pros::Task* doublePark = new pros::Task([]() {
+    while(true) {
+        // Wait until sensor detects object (distance <= 38)
+        while(bottomDist.get() > 38) {
+            pros::delay(10);
         }
         
-        return true;  // Successfully counted all balls
+        // Object detected, activate gate
+        gate.set_value(true);
+        gatePressed = true;
+        
+        // Suspend task until next activation
+        pros::Task::current().suspend();
     }
+});
+
+
 
 bool secondStageCounted(int count, int timeoutMs) {
     int currentCount = 0;
@@ -270,7 +209,7 @@ bool empty() {
 void load() {
     hoard.set_value(true);
     intakeBottom.move(127);
-    intakeTop.move(-45);
+    intakeTop.move(-60);
     intakeOn = true;
 }
 void unload() {
@@ -281,14 +220,14 @@ void unload() {
 }
 void slowUnload() {
     hoard.set_value(false);
-    intakeBottom.move(100);
-    intakeTop.move(-100);
+    intakeBottom.move(127);
+    intakeTop.move(-80);
     intakeOn = true;  // Intake is running during unload
 }
 void middleScore() {
     hoard.set_value(false);
     intakeBottom.move(127);
-    intakeTop.move(85);
+    intakeTop.move(127);
     intakeOn = true;  // Intake is running during scoring
 }
 void slowMiddleScore() {
@@ -389,16 +328,16 @@ bool isUnjamEnabled() {
 // Index/score control function - runs intake until specified number of balls scored
 void stopUntilScored(int ballsToScore) {
     // Start scoring - intake motors run to eject balls
-    slowUnload();
+    unload();
     
     int scoredCount = 0;
     
     // Threshold values for optical sensor
     // Note: Optical sensor uses proximity - higher values mean closer/ball present
-    const int BALL_PRESENT_THRESHOLD = 70;  // Higher threshold for better ball detection
+    const int BALL_PRESENT_THRESHOLD = 80;  // Higher threshold for better ball detection
     const int BALL_ABSENT_THRESHOLD = 40;   // Lower threshold to confirm ball has left
     const int DEBOUNCE_MS = 30;  // Debounce time for stable reading
-    const int MIN_BALL_GAP_MS = 100;  // Minimum time between ball counts (prevents double-counting)
+    const int MIN_BALL_GAP_MS = 50;  // Minimum time between ball counts (prevents double-counting)
     const int SAMPLE_DELAY = 5;  // Delay between sensor samples
     
     // State tracking for edge detection
@@ -467,5 +406,9 @@ void stopUntilScored(int ballsToScore) {
     }
     
     // All balls scored, stop the intake
+    extake();
+    pros::delay(300);
     rest();
+    
+    
 }
