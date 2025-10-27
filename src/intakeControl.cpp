@@ -209,7 +209,12 @@ bool empty() {
 void load() {
     hoard.set_value(true);
     intakeBottom.move(127);
-    intakeTop.move(-60);
+    intakeTop.move(-40);
+    intakeOn = true;
+}
+void slowExtake() {
+    intakeBottom.move(70);
+    intakeTop.move(-70);
     intakeOn = true;
 }
 void unload() {

@@ -5,8 +5,9 @@
 #include "lemlib/api.hpp"
 #include "pros/motors.hpp"
 #include "pros/adi.hpp"
-
+extern void slowExtake();
 extern bool gatePressed;
+
 extern pros::Task* doublePark;
 extern void load();
 extern void unload();

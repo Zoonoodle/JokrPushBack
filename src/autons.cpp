@@ -73,7 +73,54 @@ chassis.waitUntil(18);
 
 
 }
+void powerBeansAuto() {
+    rest();
+    hoard.set_value(false);
+    chassis.turnToHeading(-26, 500);
+    chassis.moveToPoint(11.5,-34, 6000, {.forwards = false, .maxSpeed = 50});
+    chassis.waitUntilDone();
+    intakeTop.move(-50);
+    hoard.set_value(true);
+    pros::delay(100);
+    chassis.moveToPoint(10, -29, 750);
+    rest();
+    chassis.turnToHeading(270,500);
+    chassis.moveToPoint(-18,-25,1000);
+    load();
+    chassis.turnToHeading(-225,750);
+    chassis.moveToPoint(-12,-31.5,1000, {.maxSpeed = 60});
+    doink.set_value(true);
+    rest();
+    chassis.waitUntilDone();
+    extake();
+    pros::delay(1000);
+    rest();
+    doink.set_value(false);
+    pros::delay(300);
+    chassis.turnToHeading(-116,500);
+    chassis.moveToPoint(-34,-41,1500, {.earlyExitRange =4});
+    load();
+    chassis.moveToPoint(-37,-43,1000, {.maxSpeed = 80});
+    doink.set_value(true);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(-20,-37, 1000, {.forwards = false});
+    chassis.waitUntil(15);
+    rest();
+    chassis.turnToHeading(-38,500);
+    chassis.moveToPoint(-39,-6,1300);
+    chassis.turnToHeading(0,300);
+    chassis.moveToPoint(-40.5,11,1000);
+    load();
+    left_motors.move(60);
+    right_motors.move(60);
+    pros::delay(750);
+    left_motors.move(0);
+    right_motors.move(0);
+    chassis.moveToPoint(-40, -20, 1000, {.forwards = false});
+    chassis.waitUntil(23);
+    unload();
 
+}
 void SigSawp15Ball() {
 
     load();
@@ -250,7 +297,7 @@ void skillsOwen(){
     
     
  
-    pros::delay(1500);
+    pros::delay(1900);
     
     
     chassis.moveToPoint(-12, 31, 650, {.earlyExitRange = 5});
@@ -269,7 +316,7 @@ void skillsOwen(){
     chassis.waitUntilDone();
    
     unload();
-    pros::delay(450);
+    pros::delay(400);
     rest();
     hoard.set_value(true);
 
@@ -280,7 +327,7 @@ void skillsOwen(){
  pros::delay(120);
  rest();
 chassis.turnToHeading(205, 500);
-rest();
+slowExtake();
 chassis.moveToPoint(-27, 4, 600, {.earlyExitRange = 8});
 
 chassis.swingToHeading(270,DriveSide::RIGHT,500, {.earlyExitRange = 8});
@@ -324,7 +371,7 @@ doink.set_value(false);
 chassis.moveToPoint(-100, 22, 1000);
 rest();
 chassis.turnToHeading(0, 500);
-moveF(495, true, true, 85, 1200);
+moveF(505, true, true, 85, 1200);
 
 chassis.turnToHeading(270, 500);
 doink.set_value(true);
@@ -390,7 +437,7 @@ doink.set_value(true);
 chassis.waitUntilDone();
 
 
-chassis.moveToPoint(-100, -69, 1200, {.forwards = false});
+chassis.moveToPoint(-103, -69, 1200, {.forwards = false});
 chassis.waitUntilDone();
 
 chassis.turnToHeading(270, 800);
@@ -408,7 +455,7 @@ chassis.turnToHeading(40, 450);
 chassis.moveToPoint(-68, -43, 600, {.earlyExitRange = 10});
 chassis.turnToHeading(100, 400);
 chassis.moveToPoint(-44, -56, 600, {.earlyExitRange = 10});
-chassis.moveToPoint(-5, -56, 800);
+chassis.moveToPoint(-7, -56, 1000);
 chassis.turnToHeading(180, 500);
 chassis.waitUntilDone();
 moveF(500, true, true, 75, 1300);
@@ -417,19 +464,20 @@ doink.set_value(true);
 load();
 
     
-chassis.moveToPoint(11,chassis.getPose().y ,1300, {.maxSpeed = 60,.minSpeed = 60});
+chassis.moveToPoint(11,chassis.getPose().y ,1300, {.maxSpeed = 50,.minSpeed = 50});
 chassis.waitUntilDone();
 left_motors.move(25);
 right_motors.move(25);
 pros::delay(1000);
 left_motors.move(0);
 right_motors.move(0);
-chassis.moveToPoint(-22, chassis.getPose().y, 1250, {.forwards = false, .minSpeed = 40});
+chassis.moveToPoint(-23.5, chassis.getPose().y, 1250, {.forwards = false, .minSpeed = 40});
 chassis.waitUntil(23);
 unload();
 
 chassis.waitUntilDone();
 pros::delay(1400);
+wings.set_value(true);
 doink.set_value(false);
 
 

@@ -1,9 +1,12 @@
-#ifndef _PROS_AUTONS_H_
-#define _PROS_AUTONS_H_
-extern void elimsMidRush();
-extern void PIDtune();
-extern void SigSawp();
-extern void skills();
-extern void SigSawp15Ball();
-extern void skillsOwen();
-#endif 
+#ifndef AUTONS_H
+#define AUTONS_H
+
+void PIDtune();
+void elimsMidRush();
+void powerBeansAuto(); 
+void SigSawp15Ball();
+void SigSawp();
+void skillsOwen();
+void skills();
+
+#endif

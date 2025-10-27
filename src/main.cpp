@@ -90,7 +90,9 @@ void competition_initialize() {}
 void autonomous() {
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
 	unjam_task->resume();  // Resume unjam task for autonomous
-	SigSawp();
+	powerBeansAuto();
+	// skillsOwen();
+	// SigSawp();
 // SigSawp();
 	// elimsMidRush();
 	// Example: Move using front sensors to 300mm distance
@@ -130,6 +132,7 @@ gatePressed = false;
 	static int lastGateToggleTime = 0;
 	
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
+	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
 	while (true) {
 		int leftY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
@@ -149,7 +152,7 @@ gatePressed = false;
 
 		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
 			intakeBottom.move(127);
-			intakeTop.move(-60);
+			intakeTop.move(-40);
 			hoard.set_value(true);
 		}
 		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
