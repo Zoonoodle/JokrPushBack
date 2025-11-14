@@ -8,5 +8,6 @@ void SigSawp15Ball();
 void SigSawp();
 void skillsOwen();
 void skills();
-
+void riskySkills();
+void sevenBall();
 #endif

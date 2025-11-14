@@ -213,8 +213,8 @@ void load() {
     intakeOn = true;
 }
 void slowExtake() {
-    intakeBottom.move(70);
-    intakeTop.move(-70);
+    intakeBottom.move(0);
+    intakeTop.move(127);
     intakeOn = true;
 }
 void unload() {
@@ -317,6 +317,17 @@ pros::Task* middleScoreAsync(int ballCount, int timeoutMs) {
     });
 }
 
+void unjam() {
+    if(intakeBottom.get_target_velocity() - intakeBottom.get_actual_velocity() > 300.0 ) {
+        pros::delay(1000);
+        if(intakeBottom.get_target_velocity() - intakeBottom.get_actual_velocity() > 300.0) {
+        extake();
+        pros::delay(300);
+        rest();
+        pros::delay(1000);
+        }
+    }
+}
 // Control functions for unjam feature
 void enableUnjam() {
     unjamEnabled = true;
@@ -416,4 +427,101 @@ void stopUntilScored(int ballsToScore) {
     rest();
     
     
+}
+
+// Color detection function - stops intake when RED ball is detected
+void stopWhenRed() {
+    const int DETECT_PROXIMITY = 100;  // Proximity threshold to ensure ball is present
+    const int DEBOUNCE_MS = 50;  // Debounce time for stable color reading
+    const int SAMPLE_DELAY = 10;  // Delay between sensor samples
+    
+    while (true) {
+        // Check if a ball is close enough to read color
+        int proximity = topOptical.get_proximity();
+        
+        if (proximity > DETECT_PROXIMITY) {
+            // Ball is present, check its color
+            double hue = topOptical.get_hue();
+            bool blockIsRed = hue > 340 || hue < 100;
+            
+            if (blockIsRed) {
+                // Red ball detected, verify with debounce
+                int stableReadingStart = pros::millis();
+                bool isStableRed = true;
+                
+                while (pros::millis() - stableReadingStart < DEBOUNCE_MS) {
+                    double newHue = topOptical.get_hue();
+                    int newProximity = topOptical.get_proximity();
+                    bool stillRed = newHue > 340 || newHue < 100;
+                    
+                    if (!stillRed || newProximity < DETECT_PROXIMITY) {
+                        // Color changed or ball moved away during debounce
+                        isStableRed = false;
+                        break;
+                    }
+                    
+                    pros::delay(5);
+                }
+                
+                if (isStableRed) {
+                    // Confirmed red ball, stop the intake
+                    rest();
+                    return;
+                }
+            }
+        }
+        
+        // Continue checking
+        pros::delay(SAMPLE_DELAY);
+    }
+}
+
+// Color detection function - stops intake when BLUE ball is detected
+// Returns a task that runs asynchronously, allowing chassis to move while monitoring
+pros::Task* stopWhenBlue() {
+    return new pros::Task([]() {
+        const int DETECT_PROXIMITY = 100;  // Proximity threshold to ensure ball is present
+        const int DEBOUNCE_MS = 50;  // Debounce time for stable color reading
+        const int SAMPLE_DELAY = 10;  // Delay between sensor samples
+        
+        while (true) {
+            // Check if a ball is close enough to read color
+            int proximity = topOptical.get_proximity();
+            
+            if (proximity > DETECT_PROXIMITY) {
+                // Ball is present, check its color
+                double hue = topOptical.get_hue();
+                bool blockIsBlue = hue > 150 && hue < 290;
+                
+                if (blockIsBlue) {
+                    // Blue ball detected, verify with debounce
+                    int stableReadingStart = pros::millis();
+                    bool isStableBlue = true;
+                    
+                    while (pros::millis() - stableReadingStart < DEBOUNCE_MS) {
+                        double newHue = topOptical.get_hue();
+                        int newProximity = topOptical.get_proximity();
+                        bool stillBlue = newHue > 150 && newHue < 290;
+                        
+                        if (!stillBlue || newProximity < DETECT_PROXIMITY) {
+                            // Color changed or ball moved away during debounce
+                            isStableBlue = false;
+                            break;
+                        }
+                        
+                        pros::delay(5);
+                    }
+                    
+                    if (isStableBlue) {
+                        // Confirmed blue ball, stop the intake
+                        rest();
+                        return;  // Task completes after stopping intake
+                    }
+                }
+            }
+            
+            // Continue checking
+            pros::delay(SAMPLE_DELAY);
+        }
+    });
 }

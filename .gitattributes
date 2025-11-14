@@ -1,0 +1,27 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Force LF for source files to prevent line ending issues
+*.cpp text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+*.ld text eol=lf
+*.mk text eol=lf
+
+# Force LF for makefiles (critical for build systems)
+Makefile text eol=lf
+makefile text eol=lf
+*.mak text eol=lf
+
+# Force LF for shell scripts
+*.sh text eol=lf
+
+# Binary files
+*.bin binary
+*.elf binary
+*.a binary
+*.o binary
+*.lib binary
+*.exe binary
+

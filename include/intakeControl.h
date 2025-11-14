@@ -18,6 +18,7 @@ extern bool secondStageCounted(int count, int timeoutMs = 5000);
 extern bool noBallsLeft();
 extern bool empty();
 extern bool isDone;
+extern void unjam();
 
 extern pros::Task* unjam_task;
 extern bool intakeOn;
@@ -42,4 +43,8 @@ extern pros::Task* middleScoreAsync(int ballCount, int timeoutMs = 5000);
 
 // Index/score control function - runs intake until specified number of balls scored
 extern void stopUntilScored(int ballsToScore);
+
+// Color detection functions - stops intake when specific color ball is detected
+extern void stopWhenRed();
+extern pros::Task* stopWhenBlue();  // Returns task that runs asynchronously
 #endif

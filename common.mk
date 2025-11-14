@@ -1,7 +1,8 @@
 ARCHTUPLE=arm-none-eabi-
 DEVICE=VEX EDR V5
 
-MFLAGS=-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=hard -Os -g -mthumb
+# Use -O2 instead of -Os for faster compilation, and remove -g for release builds
+MFLAGS=-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=hard -O2 -mthumb
 CPPFLAGS=-D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES -D_POSIX_TIMERS -D_POSIX_MONOTONIC_CLOCK
 GCCFLAGS=-ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables
 

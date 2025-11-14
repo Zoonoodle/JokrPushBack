@@ -1,6 +1,7 @@
 #include "main.h"
 #include "lemlib/api.hpp"
 #include "autons.h"
+#include "pros/optical.hpp"
 #include "robotConfigs.h"
 #include "intakeControl.h"
 // Global screen task pointer
@@ -34,13 +35,14 @@ void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
     
-    // Start the unjam task but suspend it initially
-    // It will be resumed when autonomous starts
-    unjam_task->suspend();
     
     // Suspend doublePark task initially - will be resumed when button pressed
-    doublePark->suspend();
-    
+
+	// pros::Task  unjamTask([] {
+	// 	while(unjamEnabled) {
+	// 	unjam();
+	// 	pros::delay(10);
+	// 	}});
     // Create screen display task as a global task that persists
     screen_task = new pros::Task([=]() {
         while (true) {
@@ -49,8 +51,10 @@ void initialize() {
             pros::lcd::print(1, "Y: %.2f", chassis.getPose().y); // y
             pros::lcd::print(2, "Theta: %.2f", chassis.getPose().theta); // heading
             // delay to save resources
-			pros::lcd::print(3, "Front: %.2f", frontDist.get());
-			pros::lcd::print(4, "Back: %.2f", backDist.get());
+			pros::lcd::print(3, "Front: %.2f", (float) frontDist.get());
+			pros::lcd::print(4, "Back: %.2f", (float) backDist.get());
+			pros::lcd::print(5, "Unjam: %.2f", (float) intakeBottom.get_actual_velocity());
+			pros::lcd::print(6, "Unjam Target: %.2f", (float) intakeBottom.get_target_velocity());
             pros::delay(50);
         }
     });
@@ -88,20 +92,17 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
+	topOptical.set_led_pwm(65);
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-	unjam_task->resume();  // Resume unjam task for autonomous
-	powerBeansAuto();
-	// skillsOwen();
+	// unjam_task->resume();  // Resume unjam task for autonomous
+	//elimsMidRush();
+	//powerBeansAuto();
+//elimsMidRush();
+	// sevenBall();
 	// SigSawp();
-// SigSawp();
 	// elimsMidRush();
-	// Example: Move using front sensors to 300mm distance
-	// moveF(300, false, false, 70, 3000);  // 300mm target, backwards, increasing distance, 70 speed, 3s timeout
-
-	// chassis.moveToPoint(0, 24, 2000);
-	// chassis.moveToPoint(0, 0, 2000, {.forwards = false});
-		
-	// chassis.moveToPoint(0, 0, 900, {.forwards = false});
+	//sevenBall();
+	skillsOwen();
 }
 
 
@@ -119,8 +120,8 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-
-	unjam_task->remove();
+	bool isFirstTime = true;
+	unjamEnabled = true;
 
 	
 gatePressed = false;
@@ -133,6 +134,7 @@ gatePressed = false;
 	
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+	odomLift.set_value(true);
 	while (true) {
 		int leftY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
@@ -147,7 +149,7 @@ gatePressed = false;
 
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
 			intakeBottom.move(127);
-			intakeTop.move(-127);
+			intakeTop.move(-100);
 			hoard.set_value(false);
 
 		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
@@ -156,8 +158,15 @@ gatePressed = false;
 			hoard.set_value(true);
 		}
 		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+			if(isFirstTime) {
+				isFirstTime = false;
+				unload();
+			}
 			intakeBottom.move(127);
 			intakeTop.move(127);
+		}
+		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)) {
+			slowMiddleScore();
 		}
 		
 		else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
@@ -189,9 +198,7 @@ gatePressed = false;
 				wingsPressed = false;
 			}
 		}
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
-			slowMiddleScore();
-		}
+		
 		// Handle doink toggle
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
 			doinkPressed = !doinkPressed;

@@ -9,6 +9,7 @@ extern pros::MotorGroup left_motors;
 extern pros::MotorGroup right_motors;
 extern lemlib::Drivetrain drivetrain;
 extern lemlib::Chassis chassis;
+extern lemlib::Chassis noOdomChassis;
 
 //intake
 extern pros::Motor intakeTop;
@@ -34,6 +35,7 @@ extern pros::adi::DigitalOut wings;
 extern pros::adi::DigitalOut hoard;
 extern pros::adi::DigitalOut doink;
 extern pros::adi::DigitalOut park;
+extern pros::adi::DigitalOut odomLift;
 
 
 

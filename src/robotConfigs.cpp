@@ -30,11 +30,12 @@ pros::Motor intakeBottom(-20, pros::MotorGearset::blue);
 lemlib::TrackingWheel vertical(&vertical_encoder, lemlib::Omniwheel::NEW_2, 0); // Adjust this offset based on your robot's geometry
 
 //pneumatics
-pros::adi::DigitalOut gate('G');
-pros::adi::DigitalOut wings('E');
+pros::adi::DigitalOut park('E');
+pros::adi::DigitalOut wings('C');
 pros::adi::DigitalOut hoard('D');
 pros::adi::DigitalOut doink('F'); 
-pros::adi::DigitalOut park('H');
+pros::adi::DigitalOut gate('G');
+pros::adi::DigitalOut odomLift('B');
 
 lemlib::ControllerSettings lateral(6.7, // proportional gain (kP)
     0, // integral gain (kI)
@@ -48,7 +49,7 @@ lemlib::ControllerSettings lateral(6.7, // proportional gain (kP)
   
 
 										  
-    lemlib::ControllerSettings angular(1.76, // proportional gain (kP)
+    lemlib::ControllerSettings angular(1.75, // proportional gain (kP)
       0, // integral gain (kI)
       12, // derivative gain (kD)
       0, // anti windup
@@ -75,8 +76,9 @@ lemlib::Drivetrain drivetrain(&left_motors,
 
 
 lemlib::OdomSensors sensors(&vertical, nullptr, nullptr, nullptr, &imu);
-
+lemlib::OdomSensors noOdomSensors(nullptr, nullptr, nullptr, nullptr, &imu);
 
 
   
 lemlib::Chassis chassis(drivetrain, lateral, angular, sensors, &throttle_curve, &steer_curve); 
+lemlib:: Chassis noOdomChassis(drivetrain, lateral, angular, noOdomSensors, &throttle_curve, &steer_curve); 
