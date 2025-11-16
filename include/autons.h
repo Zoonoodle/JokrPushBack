@@ -10,4 +10,5 @@ void skillsOwen();
 void skills();
 void riskySkills();
 void sevenBall();
+void antiVitalityAuto();
 #endif

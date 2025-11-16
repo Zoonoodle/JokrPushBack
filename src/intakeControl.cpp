@@ -223,6 +223,10 @@ void unload() {
     intakeTop.move(-127);
     intakeOn = true;  // Intake is running during unload
 }
+void middleGetBall() {
+    intakeBottom.move(-127);
+    intakeTop.move(-127);
+}
 void slowUnload() {
     hoard.set_value(false);
     intakeBottom.move(127);

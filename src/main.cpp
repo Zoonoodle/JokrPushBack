@@ -95,14 +95,17 @@ void autonomous() {
 	topOptical.set_led_pwm(65);
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
 	// unjam_task->resume();  // Resume unjam task for autonomous
-	//elimsMidRush();
-	//powerBeansAuto();
-//elimsMidRush();
-	// sevenBall();
+	elimsMidRush();
+	//powerBeansAuto()
 	// SigSawp();
+	// sevenBall();
+	// skillsOwen();
+	// SigSawp15Ball();
+	// antiVitalityAuto();
 	// elimsMidRush();
-	//sevenBall();
-	skillsOwen();
+	// //sevenBall();
+	// odomLift.set_value(true);
+	// noOdomChassis.moveToPoint(1, 26, 2000, {.maxSpeed = 90, .minSpeed = 90, .earlyExitRange = 5});
 }
 
 
@@ -120,6 +123,11 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	// left_motors.move(75);
+	// right_motors.move(75);
+	// pros::delay(1000);
+	// left_motors.move(0);
+	// right_motors.move(0);
 	bool isFirstTime = true;
 	unjamEnabled = true;
 
@@ -134,7 +142,7 @@ gatePressed = false;
 	
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-	odomLift.set_value(true);
+	// odomLift.set_value(true);
 	while (true) {
 		int leftY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
@@ -149,7 +157,7 @@ gatePressed = false;
 
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
 			intakeBottom.move(127);
-			intakeTop.move(-100);
+			intakeTop.move(-127);
 			hoard.set_value(false);
 
 		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {

@@ -7,7 +7,7 @@
 
 void skillsOwen(){
 chassis.setPose(0,-1,0);
-    moveF(500, true, true, 75, 1200);
+    moveF(495, true, true, 75, 1200);
     load();
     chassis.turnToHeading(90, 500);
     doink.set_value(true);
@@ -22,7 +22,7 @@ chassis.setPose(0,-1,0);
     left_motors.move(0);
     right_motors.move(0);
     
-    chassis.moveToPoint(-22,chassis.getPose().y,1350,{.forwards = false, .minSpeed = 40});
+    chassis.moveToPoint(-22,chassis.getPose().y+.5,1350,{.forwards = false, .minSpeed = 40});
     load();
     chassis.waitUntil(24);
     unload();   
@@ -38,7 +38,7 @@ chassis.setPose(0,-1,0);
     rest();
     chassis.turnToHeading(190, 500);
     load();
-    chassis.moveToPoint(-31, 0, 1500, {.maxSpeed = 60});
+    chassis.moveToPoint(-29.5, 0, 1500, {.maxSpeed = 60});
     chassis.waitUntil(27);
     doink.set_value(true);
     
@@ -46,7 +46,7 @@ chassis.setPose(0,-1,0);
     chassis.moveToPoint(-6.7, 29, 1000, {.forwards = false});
     chassis.turnToHeading(90, 750);
     doink.set_value(false);
-    chassis.moveToPoint(-22,chassis.getPose().y,1000,{.forwards = false, .minSpeed = 40});
+    chassis.moveToPoint(-22,30,1000,{.forwards = false, .minSpeed = 40});
     chassis.waitUntilDone();
    
     unload();
@@ -62,21 +62,21 @@ chassis.setPose(0,-1,0);
  rest();
 chassis.turnToHeading(205, 500);
 rest();
-chassis.moveToPoint(-27, 4, 600, {.earlyExitRange = 8});
+chassis.moveToPoint(-27, 7, 600, {.earlyExitRange = 8});
 
 chassis.swingToHeading(270,DriveSide::RIGHT,500, {.earlyExitRange = 8});
 extake();
 pros::delay(80);
 rest();
-chassis.moveToPoint(-60, 5.5, 600, {.earlyExitRange = 10});
+chassis.moveToPoint(-60, 7.5, 600, {.earlyExitRange = 10});
 rest();
-chassis.moveToPoint(-82, 6, 1000, {.maxSpeed = 85});
+chassis.moveToPoint(-82, 8, 1000, {.maxSpeed = 85});
 load();
 chassis.waitUntil(12);
 doink.set_value(true);
 chassis.turnToHeading(270, 400);
 chassis.waitUntilDone();
-moveF(1140, false, false, 110, 700);
+moveF(1135, false, false, 110, 700);
 chassis.turnToHeading(320, 550);
 rest();
 
@@ -91,25 +91,18 @@ rest();
 rest();
 
 //MIDDLE SCORE
-moveB(245, false, true, 100, 750);
-left_motors.move(-25);
-right_motors.move(-25);
-pros::delay(100);
+moveB(250, false, true, 100, 750);
+
 middleScore();
+moveB(220, false, true, 75, 600);
 
-
-pros::delay(750);
+pros::delay(550);
 extake();
 pros::delay(125);
 middleScore();
-left_motors.move(0);
-right_motors.move(0);
-moveB(235, true, false, 75, 600);
-rest();
-middleScore();
 
 
-pros::delay(1000);
+pros::delay(1100);
 
 
 
@@ -124,7 +117,7 @@ moveF(495, true, true, 85, 1200);
 
 chassis.turnToHeading(270, 500);
 doink.set_value(true);
-chassis.moveToPoint(-117, chassis.getPose().y, 1000, {.maxSpeed = 60,.minSpeed = 60});
+chassis.moveToPoint(-117, chassis.getPose().y-.25, 1000, {.maxSpeed = 60,.minSpeed = 60});
 load();
 chassis.waitUntilDone();
 
@@ -135,13 +128,17 @@ left_motors.move(0);
 right_motors.move(0);
 
 chassis.moveToPoint(-82, chassis.getPose().y, 1200, {.forwards = false,  .maxSpeed = 80, .minSpeed = 40});
-chassis.waitUntil(25);
+chassis.waitUntil(23.5);
 unload();
 doink.set_value(false);
 
 chassis.waitUntilDone();
-pros::delay(1100);
-slowUnload();
+pros::delay(500);
+extake();
+pros::delay(120);
+unload();
+pros::delay(1000);
+
 
 chassis.moveToPoint(chassis.getPose().x - 12.5, chassis.getPose().y, 800);
 chassis.turnToHeading(180, 450);
@@ -186,13 +183,13 @@ doink.set_value(true);
 chassis.waitUntilDone();
 
 
-chassis.moveToPoint(-100, chassis.getPose().y - 23, 1200, {.forwards = false});
+chassis.moveToPoint(-100, chassis.getPose().y - 24, 1200, {.forwards = false});
 chassis.waitUntilDone();
 
 chassis.turnToHeading(270, 800);
 chassis.waitUntilDone();
 
-chassis.moveToPoint(-83, chassis.getPose().y, 1000, {.forwards = false, .minSpeed = 40});
+chassis.moveToPoint(-83, chassis.getPose().y-.1, 1000, {.forwards = false, .minSpeed = 40});
 chassis.waitUntil(15);
 unload();
 doink.set_value(false);
@@ -231,14 +228,28 @@ pros::delay(1400);
 doink.set_value(false);
 
 
-chassis.moveToPoint(13, -56.5, 600);
-chassis.turnToHeading(9, 300);
+chassis.moveToPoint(12, -56.5, 700);
+chassis.turnToHeading(9, 550);
 // extake();
-chassis.moveToPoint(17, -23.5, 2000, {.maxSpeed = 90, .minSpeed = 90, .earlyExitRange = 5});
+// chassis.moveToPoint(17, -23.5, 2000, {.maxSpeed = 90, .minSpeed = 90, .earlyExitRange = 5});
+
+
+chassis.waitUntilDone();
 // odomLift.set_value(true);
-// chassis.waitUntilDone();
-// noOdomChassis.setPose(chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta);
-// noOdomChassis.moveToPoint(17, -27.5, 2000, {.maxSpeed = 90, .minSpeed = 90, .earlyExitRange = 5});
+// noOdomChassis.setPose(0,0,0);
+
+// extake();
+chassis.moveToPoint(17, -23.5, 2000, {.maxSpeed = 80, .minSpeed = 80, .earlyExitRange = 5});// while(frontDist.get() > 1700 ){pros::delay(50);}
+// noOdomChassis.waitUntil(22);
+extake();
+
+// while(true){
+//     left_motors.move(0);
+//     right_motors.move(0);
+//     nochassis.moveT
+//     pros::delay(50);
+// }
+//placeholder for distance sensor
 }   
 
 // void riskySkills(){

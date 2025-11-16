@@ -19,7 +19,7 @@ extern bool noBallsLeft();
 extern bool empty();
 extern bool isDone;
 extern void unjam();
-
+extern void middleGetBall();
 extern pros::Task* unjam_task;
 extern bool intakeOn;
 extern bool unjamEnabled;
