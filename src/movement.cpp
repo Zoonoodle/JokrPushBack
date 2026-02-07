@@ -19,10 +19,10 @@
  */
 void moveB(double distance, bool forwards, bool decreasing, int maxSpeed, int minSpeed, int timeOutMs) {
     // PID constants - tune these for optimal performance
-    const double kP = 0.23;
-    const double kD = 0.525;   // Derivative gain
-    const double tolerance = 7.0;  // Distance tolerance in mm
-    const int settleTime = 100;  // Time to stay within tolerance before exiting (ms)
+    const double kP = 0.3;  // Proportional gain
+    const double kD = 0.75;  // Derivative gain
+    const double tolerance = 2.5;  // Distance tolerance in mm
+    const int settleTime = 55;  // Time to stay within tolerance before exiting (ms)
     
     // Error tracking
     double prevError = 0;
@@ -127,10 +127,10 @@ void moveB(double distance, bool forwards, bool decreasing, int maxSpeed, int mi
  */
 void moveF(double distance, bool forwards, bool decreasing, int maxSpeed, int minSpeed, int timeOutMs) {
     // PID constants - tune these for optimal performance
-    const double kP = 0.22;  // Proportional gain
-    const double kD = 0.525;  // Derivative gain
-    const double tolerance = 5.0;  // Distance tolerance in mm
-    const int settleTime = 100;  // Time to stay within tolerance before exiting (ms)
+    const double kP = 0.3;  // Proportional gain
+    const double kD = 0.75;  // Derivative gain
+    const double tolerance = 2.5;  // Distance tolerance in mm
+    const int settleTime = 55;  // Time to stay within tolerance before exiting (ms)
     
     // Error tracking
     double prevError = 0;

@@ -1,7 +1,9 @@
 #include "main.h"
 #include "lemlib/api.hpp"
 #include "autons.h"
-#include "pros/optical.hpp"
+#include "movement.h"
+#include "pros/misc.h"
+#include "pros/rtos.hpp"
 #include "robotConfigs.h"
 #include "intakeControl.h"
 // Global screen task pointer
@@ -32,17 +34,16 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+	
     pros::lcd::initialize(); // initialize brain screen
-    chassis.calibrate(); // calibrate sensors
-    
-    
-    // Suspend doublePark task initially - will be resumed when button pressed
+    armRot.reset(); 
+	// zero the arm rotation sensor
+    chassis.calibrate();// calibrate sensors
+	
 
-	// pros::Task  unjamTask([] {
-	// 	while(unjamEnabled) {
-	// 	unjam();
-	// 	pros::delay(10);
-	// 	}});
+    // Start intake unjam background task
+    pros::Task unjamTask(intakeUnjamTask);
+
     // Create screen display task as a global task that persists
     screen_task = new pros::Task([=]() {
         while (true) {
@@ -53,8 +54,8 @@ void initialize() {
             // delay to save resources
 			pros::lcd::print(3, "Front: %.2f", (float) frontDist.get());
 			pros::lcd::print(4, "Back: %.2f", (float) backDist.get());
-			pros::lcd::print(5, "Unjam: %.2f", (float) intakeBottom.get_actual_velocity());
-			pros::lcd::print(6, "Unjam Target: %.2f", (float) intakeBottom.get_target_velocity());
+			pros::lcd::print(5, "Arm Pos: %.2f", (float) armRot.get_position() / 100.0); // degrees
+			pros::lcd::print(6, "Intake Vel: %.2f", (float) intake.get_actual_velocity());
             pros::delay(50);
         }
     });
@@ -67,7 +68,6 @@ void initialize() {
  */
 void disabled() {
     // Screen task continues running even when disabled
-	hoard.set_value(true);
 }
 
 /**
@@ -93,20 +93,11 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	// wings.set_value(true);
-	topOptical.set_led_pwm(65);
+	SigSawp();
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-	// unjam_task->resume();  // Resume unjam task for autonomous
-// elimsMidRush();
-leftSide4ball();	// SigSawp();
-	// sevenBall();
-	// skillsOwen();
-	// SigSawp15Ball();
-	// antiVitalityAuto();
-	// elimsMidRush();
-	// //sevenBall();
-	// odomLift.set_value(true);
-	// noOdomChassis.moveToPoint(1, 26, 2000, {.maxSpeed = 90, .minSpeed = 90, .earlyExitRange = 5});
+	// PIDtune();
+	// TODO: Update autonomous routines for new robot
+	// leftSide4ball();
 }
 
 
@@ -123,88 +114,95 @@ leftSide4ball();	// SigSawp();
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+enum ArmState { ARM_IDLE, ARM_PRIMING, ARM_UP, ARM_RETRACTING };
 void opcontrol() {
-	// left_motors.move(75);
-	// right_motors.move(75);
-	// pros::delay(1000);
-	// left_motors.move(0);
-	// right_motors.move(0);
-	bool isFirstTime = true;
-	unjamEnabled = true;
 
-	
-gatePressed = false;
-	static bool doubleParkReady = false;
-	static bool doinkPressed = false;
-	static bool parkPressed = false;
-	static bool gatePressed = false;
-	static bool wingsPressed = false;
-	static int lastGateToggleTime = 0;
-	
+	// moveF(300, true, true, 70, 0, 1000);
+	// Pneumatic toggle states
+	static bool fourBarPressed = false;
+	static bool scraperPressed = false;
+	static bool intakeLiftPressed = false;
+	static bool hoardPressed = false;
+
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-	// odomLift.set_value(true);
+	arm.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
 	while (true) {
+		// === DRIVETRAIN ===
 		int leftY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-        int rightX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-        // move the chassis with arcade controls
-        chassis.arcade(leftY, // throttle
-                       rightX * 0.65, // steer (reduced sensitivity)
-                       true, // enable drive curves for smoother control
-                       0.7 // slightly prioritize steering
-		);
+		int rightX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+		chassis.arcade(leftY, rightX * 0.65, true, 0.7);
 
+		// === INTAKE CONTROL ===
+		// Skip writing to the intake motor while the unjam routine is active
+		if (!intakeUnjamming) {
+			if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+				intake.move(127);
+				hoard.set_value(true);
+			} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+				intake.move(-127);
+			} else {
+				intake.move(0);
+			}
+		}
 
+		// === ARM CONTROL (non-blocking) ===
+		static ArmState armState = ARM_IDLE;
+		static uint32_t armTimer = 0;
 
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-			intakeBottom.move(127);
-			intakeTop.move(-127);
-			hoard.set_value(false);
-
-		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-			intakeBottom.move(127);
-			intakeTop.move(-100);
-			hoard.set_value(true);
-		}
-		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-			if(isFirstTime) {
-				isFirstTime = false;
-				unload();
+			if (armState != ARM_PRIMING && armState != ARM_UP) {
+				hoard.set_value(false);
+				intake.move(127);
+				pros::delay(50);
+				armTimer = pros::millis();
+				armState = ARM_PRIMING;
+			} else if (armState == ARM_PRIMING && pros::millis() - armTimer >= 50) {
+				arm.move(127);
+				armState = ARM_UP;
+			} else if (armState == ARM_UP) {
+				arm.move(127);
 			}
-			intakeBottom.move(127);
-			intakeTop.move(127);
-		}
-		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)) {
-			slowMiddleScore();
-		}
-		
-	
-		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-			intakeBottom.move(-127);
-			intakeTop.move(127);
-		}
-		else {
-			intakeBottom.move(0);
-			intakeTop.move(0);
+		} else {
+			if (armState == ARM_UP || armState == ARM_PRIMING) {
+				arm.move(-127);
+				armTimer = pros::millis();
+				armState = ARM_RETRACTING;
+			} else if (armState == ARM_RETRACTING) {
+				if (pros::millis() - armTimer >= 350) {
+					arm.move(0);
+					armState = ARM_IDLE;
+				}
+			} else {
+				arm.move(0);
+			}
 		}
 
+		// === PNEUMATIC TOGGLES ===
+		// A: Toggle fourBar
 		// Wings up by default, down while R2 is held
-		wings.set_value(!master.get_digital(pros::E_CONTROLLER_DIGITAL_R2));
-			
-		// Handle wings toggle
-		
-		
-		// Handle doink toggle
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
-			doinkPressed = !doinkPressed;
-			doink.set_value(doinkPressed);
+		wing.set_value(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2));
+
+
+		// B: Toggle scraper
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+			scraperPressed = !scraperPressed;
+			scraper.set_value(scraperPressed);
 		}
 
-		
-
-		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
-			doubleParkReady = false;
+		// X: Toggle intake lift
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+			fourBarPressed = !fourBarPressed;
+			fourBar.set_value((fourBarPressed));
 		}
-		pros::delay(20);          // Run for 20 ms then update
+
+		// Y: Toggle hoard
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+			hoardPressed = !hoardPressed;
+			hoard.set_value(hoardPressed);
+		}
+
+		pros::delay(20);
 	}
 }

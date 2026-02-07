@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "lemlib/api.hpp"
+#include "pros/rotation.hpp"
 
 //dt stuff
 extern pros::MotorGroup left_motors;
@@ -11,31 +12,31 @@ extern lemlib::Drivetrain drivetrain;
 extern lemlib::Chassis chassis;
 extern lemlib::Chassis noOdomChassis;
 
-//intake
-extern pros::Motor intakeTop;
-extern pros::Motor intakeBottom;
-extern pros::Distance bottomDist;
+// Intake and Arm
+extern pros::Motor intake;
+extern pros::Motor arm;
+extern pros::Rotation armRot;
+
+// Distance sensors
+extern pros::Distance rightDist;
+extern pros::Distance leftDist;
 extern pros::Distance backDist;
 extern pros::Distance frontDist;
 
-// Additional distance sensors
-
 extern double distSensorOffsets[4]; //front, left, back, right offsets in inches
 
-extern pros::Optical topOptical;
 //tracking stuff
 extern pros::Rotation vertical_encoder;
 extern pros::Imu imu;
 extern lemlib::TrackingWheel vertical;
 extern lemlib::OdomSensors sensors;
 
-//pneumatics
-extern pros::adi::DigitalOut gate;
-extern pros::adi::DigitalOut wings;
+// Pneumatics (5 total)
+extern pros::adi::DigitalOut fourBar;
+extern pros::adi::DigitalOut scraper;
+extern pros::adi::DigitalOut intakeLift;
+extern pros::adi::DigitalOut wing;
 extern pros::adi::DigitalOut hoard;
-extern pros::adi::DigitalOut doink;
-extern pros::adi::DigitalOut park;
-extern pros::adi::DigitalOut odomLift;
 
 
 
