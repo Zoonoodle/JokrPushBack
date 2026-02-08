@@ -79,7 +79,9 @@ void disabled() {
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {}
+void competition_initialize() {
+	fourBar.set_value(true);
+}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -93,8 +95,12 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	SigSawp();
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+	leftSide4ball();
+	// SigSawp();
+	// chassis.moveToPoint(0, 5, 1000);
+	// Low54();
+	// 
 	// PIDtune();
 	// TODO: Update autonomous routines for new robot
 	// leftSide4ball();
@@ -196,7 +202,10 @@ void opcontrol() {
 			fourBarPressed = !fourBarPressed;
 			fourBar.set_value((fourBarPressed));
 		}
-
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+			fourBarPressed = !fourBarPressed;
+			fourBar.set_value((fourBarPressed));
+		}
 		// Y: Toggle hoard
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
 			hoardPressed = !hoardPressed;

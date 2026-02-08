@@ -27,7 +27,7 @@ double distSensorOffsets[4] = {4, 2, 1, 2};
 
 //motors
 pros::MotorGroup left_motors({-11, -14, -1}, pros::MotorGearset::blue);
-pros::MotorGroup right_motors({20, 7, 10}, pros::MotorGearset::blue);
+pros::MotorGroup right_motors({19, 7, 10}, pros::MotorGearset::blue);
 
 pros::Motor intake(-3, pros::MotorGearset::blue);
 pros::Motor arm(-9, pros::MotorGearset::red);

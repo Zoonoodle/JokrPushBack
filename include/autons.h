@@ -14,4 +14,6 @@ void antiVitalityAuto();
 void lateMidSawp();
 void leftSideNineBall();
 void leftSide4ball();
+void Low54();
+
 #endif
