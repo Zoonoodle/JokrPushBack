@@ -39,11 +39,22 @@ void moveB(double distance, bool forwards, bool decreasing, int maxSpeed, int mi
         
         // Read current distance from back sensor
         int32_t currentDistance = backDist.get();
-        
-        // If sensor returns error or max reading, stop
-        if (currentDistance == PROS_ERR || currentDistance >= 9910) {
-            std::cout << "Distance sensor error or no object detected" << std::endl;
+
+        // If sensor returns a true error, stop
+        if (currentDistance == PROS_ERR) {
+            std::cout << "Back distance sensor error" << std::endl;
             break;
+        }
+
+        // If sensor reads out of range (9999), drive at max speed until in range
+        if (currentDistance >= 9910) {
+            int approachPower = forwards ? maxSpeed : -maxSpeed;
+            left_motors.move(approachPower);
+            right_motors.move(approachPower);
+            prevError = 0;
+            std::cout << "Back sensor out of range (" << currentDistance << "mm), driving at max speed" << std::endl;
+            pros::delay(20);
+            continue;
         }
         
         // Calculate error based on whether we want distance to decrease or increase
@@ -127,8 +138,8 @@ void moveB(double distance, bool forwards, bool decreasing, int maxSpeed, int mi
  */
 void moveF(double distance, bool forwards, bool decreasing, int maxSpeed, int minSpeed, int timeOutMs) {
     // PID constants - tune these for optimal performance
-    const double kP = 0.3;  // Proportional gain
-    const double kD = 0.75;  // Derivative gain
+    const double kP = 0.28;  // Proportional gain
+    const double kD = 0.69;  // Derivative gain
     const double tolerance = 2.5;  // Distance tolerance in mm
     const int settleTime = 55;  // Time to stay within tolerance before exiting (ms)
     
@@ -147,11 +158,22 @@ void moveF(double distance, bool forwards, bool decreasing, int maxSpeed, int mi
         
         // Read current distance from front sensor
         int32_t currentDistance = frontDist.get();
-        
-        // If sensor returns error or max reading, stop
-        if (currentDistance == PROS_ERR || currentDistance >= 9999) {
-            std::cout << "Front distance sensor error or no object detected" << std::endl;
+
+        // If sensor returns a true error, stop
+        if (currentDistance == PROS_ERR) {
+            std::cout << "Front distance sensor error" << std::endl;
             break;
+        }
+
+        // If sensor reads out of range (9999), drive at max speed until in range
+        if (currentDistance >= 9910) {
+            int approachPower = forwards ? maxSpeed : -maxSpeed;
+            left_motors.move(approachPower);
+            right_motors.move(approachPower);
+            prevError = 0;
+            std::cout << "Front sensor out of range (" << currentDistance << "mm), driving at max speed" << std::endl;
+            pros::delay(20);
+            continue;
         }
         
         // Calculate error based on whether we want distance to decrease or increase

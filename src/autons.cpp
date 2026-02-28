@@ -12,69 +12,83 @@
 // New robot has: single intake motor, arm motor with PID, 5 pneumatics (fourBar, scraper, intakeLift, odomLift, hoard)
 void SigSawp() {
     pros::Task unjamTask(intakeUnjamTask);
-    fourBar.set_value(true);
-    moveF(474, true, true, 75, 0, 1000);
-    chassis.turnToHeading(90, 600);
+    fourBar.set_value(false);
+    moveF(490, true, true, 70, 0, 1000);
+    chassis.turnToHeading(92, 550);
     
     intake.move(127);
 pros::delay(100);
 scraper.set_value(true);
-    chassis.moveToPoint(10, chassis.getPose().y, 1200, {.maxSpeed = 60, .minSpeed = 55});
+
+    chassis.moveToPoint(10.25, chassis.getPose().y, 1000, {.maxSpeed = 40               , .minSpeed = 40});
     chassis.waitUntilDone();
-   
-
-
+//    left_motors.move(45);
+//    right_motors.move(45);
+// pros::delay(1300);
+fourBar.set_value(true);
     chassis.moveToPoint(-22,chassis.getPose().y, 1600, {.forwards = false});
-    chassis.waitUntil(19);
+    chassis.waitUntil(18);
     hoard.set_value(false);
     
-    pros::delay(200);
+    pros::delay(350);
 arm.move(127);
 
     chassis.waitUntilDone();
+    pros::delay(150);
     scraper.set_value(false);
+  
+    pros::delay(400);
     intake.move(-127);
-    pros::delay(300);
-   
 
-    chassis.moveToPoint(chassis.getPose().x + 6,chassis.getPose().y, 500);
+    chassis.moveToPoint(chassis.getPose().x + 8,chassis.getPose().y, 600);
     
 
-    pros::delay(300);
+    pros::delay(100);
     arm.move(-127);
     
+
+   chassis.waitUntilDone();
+    chassis.turnToHeading(210, 500);
+ 
+    chassis.moveToPoint(-26, 5, 800, {.maxSpeed = 80});
+    fourBar.set_value(false);
     intake.move(127);
-   
-    chassis.turnToHeading(217, 500);
-    chassis.moveToPoint(-26, 14, 1000, {.maxSpeed =85});
     arm.move(-10);
+    hoard.set_value(true);
 
 
-    chassis.swingToHeading(180, lemlib::DriveSide::LEFT, 250);
-    chassis.moveToPoint(-27, -34, 800, {.earlyExitRange = 10});
-    pros::delay(200);
-    intake.move(-80);
+   
+    chassis.moveToPoint(-29, -34, 800, {.earlyExitRange = 10});
+    intake.move(-127);
+    
     pros::delay(100);
     intake.move(127);
-    chassis.moveToPoint(-27, -38, 1300, {.maxSpeed = 60});
-    chassis.waitUntil(4);
+    chassis.moveToPoint(-29, -40, 800, {.maxSpeed = 80});
+    chassis.waitUntil(2);
     scraper.set_value(true);
     
 
 intake.move(127);
 
-chassis.turnToHeading(144,  400);
-scraper.set_value(false);
-chassis.moveToPoint(-6, -68.5, 800);
-chassis.turnToHeading(90, 350);
-scraper.set_value(true);
+chassis.turnToHeading(144,  300);
+
+chassis.moveToPoint(-6, -71, 1000);
+
+intake.move(-127);
+pros::delay(150);
 intake.move(127);
-chassis.moveToPoint(-23, -69.5, 1500, {.forwards = false});
-chassis.waitUntil(5);
+chassis.turnToHeading(90, 450);
+// scraper.set_value(true);
+intake.move(127);
+pros::delay(200);
+fourBar.set_value(true);
+chassis.moveToPoint(-23, -71, 1500, {.forwards = false, .maxSpeed = 90, .minSpeed = 50});
+
+chassis.waitUntil(6);
 hoard.set_value(false);
 intake.move(127);
 pros::delay(200);
-scraper.set_value(true);
+
 arm.move(127);
 
 
@@ -82,31 +96,52 @@ chassis.waitUntilDone();
 intake.move(-127);
 left_motors.move(0);
 right_motors.move(0);
-pros::delay(300);
+pros::delay(150);
 arm.move(-127);
 
-chassis.moveToPoint(-8, -69, 700, {.maxSpeed = 80, .minSpeed = 70});
-chassis.moveToPoint(11, -69   , 1300, {.maxSpeed = 55, .minSpeed = 50});
+chassis.moveToPoint(0, chassis.getPose().y, 500, {.maxSpeed = 65, .minSpeed = 60, .earlyExitRange = 5});
+scraper.set_value(true);
+chassis.moveToPoint(12, chassis.getPose().y, 700, {.maxSpeed = 45, .minSpeed = 40});
+fourBar.set_value(false);
 intake.move(127);
 chassis.waitUntilDone();
-pros::delay(250);
-left_motors.move(35);
-right_motors.move(35);
+left_motors.move(30);
+right_motors.move(30);
+pros::delay(300);
+
 intake.move(127);
 
 hoard.set_value(true);
 
 
 
-moveF(470, false, false, 90, 40, 500);
-chassis.turnToHeading(140, 300);
- chassis.moveToPoint(-36, -33,2100, {.forwards = false, .minSpeed = 30});
+// moveF(535 , false, false, 80, 0, 1000);
+chassis.moveToPoint(chassis.getPose().x - 7, chassis.getPose().y, 500, {.forwards = false});
+
+// chassis.turnToHeading(140, 400);
+// chassis.waitUntilDone();
+// chassis.setPose(0,0,0);
+// chassis.moveToPoint(0, -32, 600, {.forwards = false, .earlyExitRange = 5});
 fourBar.set_value(false);
 scraper.set_value(false);
- pros::delay(1300);
- hoard.set_value(false);
- pros::delay(100);
- arm.move(80);
+
+chassis.moveToPoint(-36.5, -34.25,2000, {.forwards = false, .maxSpeed = 80});
+// chassis.moveToPoint(0,-47, 1800, {.forwards = false, .maxSpeed = 70, .minSpeed = 60});
+
+pros::delay(1000);
+hoard.set_value(false);
+pros::delay(150);
+arm.move(80);
+
+chassis.waitUntilDone();
+left_motors.move(5);
+right_motors.move(5);
+
+
+//  pros::delay(100);
+ 
+
+
 
 
 }
@@ -124,7 +159,7 @@ void Low54() {
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
     //to first cluster
    chassis.turnToHeading(19, 100);
-   chassis.moveToPoint(7,18, 1000, {.maxSpeed = 70});
+   chassis.moveToPoint(8,19, 1000, {.maxSpeed = 70});
    intake.move(127);
    hoard.set_value(true);
    //grab first cluster
@@ -133,46 +168,55 @@ void Low54() {
  
    //to middle
    chassis.turnToHeading(50, 500);
-   chassis.moveToPoint(30,39,1000);
+   chassis.moveToPoint(30.5,40,1000, {.maxSpeed = 85});
 
    scraper.set_value(false);
     //to long
-     chassis.moveToPoint(15,13, 1000, {.forwards = false});
+     chassis.moveToPoint(15,11, 1200, {.forwards = false});
      chassis.turnToHeading(270, 600);
      fourBar.set_value(true);
      moveB(450, false,true, 80, 0, 1500);
-     chassis.turnToHeading(180, 500);
-     chassis.moveToPoint(chassis.getPose().x, chassis.getPose().y + 12, 500, {.forwards = false});
+     chassis.turnToHeading(179, 500);
+     chassis.moveToPoint(chassis.getPose().x, chassis.getPose().y + 13, 500, {.forwards = false});
      chassis.waitUntil(5);
      hoard.set_value(false);
      arm.move(127);
 
-     pros::delay(300);
+     pros::delay(400);
      intake.move(-127);
-     pros::delay(200);
-     arm.move(-127);
-     chassis.moveToPoint(chassis.getPose().x - 1, -12, 2000, {.maxSpeed = 60, .minSpeed = 50});
+     pros::delay(400);
+     arm.move(-100);
+     chassis.moveToPoint(chassis.getPose().x-.5, -12.5, 2000, {.maxSpeed = 55, .minSpeed = 50});
      scraper.set_value(true);
-     pros::delay(300);
+     pros::delay(600);
      arm.move(-10);
      intake.move(127);
      chassis.waitUntilDone();
-     left_motors.move(50);
-     right_motors.move(50);
+     hoard.set_value(true);
+     left_motors.move(30);
+     right_motors.move(30);
      pros::delay(500);
     moveF(460, false, false, 50, 0, 1000);
     scraper.set_value(false);
-     chassis.turnToHeading(-44.5, 700);
-     chassis.moveToPoint(0, 34, 2500, {.maxSpeed = 90});
-     chassis.waitUntilDone();
+     chassis.turnToHeading(-45, 700);
+     chassis.moveToPoint(-.5, 34, 1650, {.maxSpeed = 65});
+pros::delay(1500);
 
-     intake.move(-127);
-     pros::delay(1000);
-     chassis.moveToPoint(24.5, 8, 1500, {.forwards = false});
-     chassis.turnToHeading(-2, 300);
+     intake.move(-90);
+     chassis.waitUntilDone();
+     left_motors.move(-25);
+         right_motors.move(-25);
+         pros::delay(350);
+         left_motors.move(0);
+         right_motors.move(0);
+         intake.move(-90);
+         pros::delay(900);
+     chassis.moveToPoint(27, 6, 1500, {.forwards = false});
+     chassis.turnToHeading(0, 300);
      wing.set_value(true);
-     chassis.moveToPoint(chassis.getPose().x, 40, 1000);
-    chassis.turnToHeading(-5, 400);
+     chassis.moveToPoint(chassis.getPose().x, 38, 1000);
+     chassis.waitUntilDone();
+    chassis.turnToHeading(-15, 10000);
      //28,8
 
     
@@ -202,7 +246,91 @@ void PIDtune() {
 }
 
 void elimsMidRush() {
-    // TODO: Rewrite for new robot
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+    //to first cluster
+
+intake.move(127);
+chassis.turnToHeading(19, 150);
+
+   chassis.moveToPoint(10,18, 900, {.maxSpeed = 75});
+
+   
+   hoard.set_value(true);
+   //grab first cluster
+   chassis.waitUntil(17);
+    scraper.set_value(true);
+ 
+   //to middle
+   chassis.turnToHeading(50, 350);
+  pros::delay(200);
+  scraper.set_value(false);
+   chassis.moveToPoint(32,40.5, 1000, {.maxSpeed = 75});
+  
+    //.back to low
+    chassis.moveToPoint(8, 29, 1000, {.forwards = false});
+    chassis.turnToHeading(-50, 600);
+    // fourBar.set_value(true);
+    //go to low
+    chassis.moveToPoint(0, 36, 850, {.maxSpeed = 65});
+   
+    pros::delay(400);
+  
+         intake.move(-75);
+         chassis.waitUntilDone();
+         fourBar.set_value(true);
+         left_motors.move(-25);
+         right_motors.move(-25);
+         pros::delay(350);
+         left_motors.move(0);
+         right_motors.move(0);
+         intake.move(-85);
+         pros::delay(900);
+
+
+    //go to matchload
+    chassis.moveToPoint(32, 0, 1200, {.forwards = false});
+  
+    intake.move(127);
+    chassis.turnToHeading(269, 500);
+    
+fourBar.set_value(false);
+
+    chassis.waitUntilDone();
+    intake.move(0);
+    moveB(420, false, true, 70, 0, 700);
+
+    //turn to match
+    chassis.turnToHeading(178, 600);
+    scraper.set_value(true);
+
+    chassis.moveToPoint(chassis.getPose().x-.5, -12, 950, {.maxSpeed = 45, .minSpeed = 45});
+        intake.move(127);
+      
+      
+        chassis.waitUntilDone();
+    left_motors.move(25);
+    right_motors.move(25);
+    pros::delay(220);
+
+
+    //move back
+    chassis.moveToPoint(chassis.getPose().x, -5, 700, {.forwards = false});
+    chassis.turnToHeading(-64, 400);
+    scraper.set_value(false);
+    
+    //go to middle
+    chassis.moveToPoint(-37, 26, 2000, {.maxSpeed = 90});
+    chassis.turnToHeading(-140, 550);
+    chassis.moveToPoint(-26.5, 36.5, 1500, {.forwards = false, .maxSpeed = 55});
+
+    chassis.waitUntil(8);
+    hoard.set_value(false);
+    pros::delay(150);
+    arm.move(115);
+    chassis.waitUntilDone();
+    left_motors.move(5);
+    right_motors.move(5);
+
 }
 
 void sevenBall() {

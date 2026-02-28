@@ -45,3 +45,6 @@ Thumbs.db
 # PROS specific
 compile_commands.json
 .pros/
+
+# Local caches
+.cache/

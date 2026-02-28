@@ -80,7 +80,8 @@ void disabled() {
  * starts.
  */
 void competition_initialize() {
-	fourBar.set_value(true);
+	// fourBar.set_value(true);
+	hoard.set_value(true);
 }
 
 /**
@@ -96,8 +97,13 @@ void competition_initialize() {
  */
 void autonomous() {
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-	leftSide4ball();
+	
+	// leftSide4ball();
 	// SigSawp();
+	elimsMidRush();
+
+	// moveF(300, true, true, 70, 0, 1000);
+	// skills();
 	// chassis.moveToPoint(0, 5, 1000);
 	// Low54();
 	// 
@@ -122,8 +128,14 @@ void autonomous() {
  */
 enum ArmState { ARM_IDLE, ARM_PRIMING, ARM_UP, ARM_RETRACTING };
 void opcontrol() {
-
-	// moveF(300, true, true, 70, 0, 1000);
+// skills();
+	// arm.move(-127);
+	// pros::delay(400);
+	// arm.move(0);
+	
+	// moveF(300, true
+	// 
+	// , true, 70, 0, 1000);
 	// Pneumatic toggle states
 	static bool fourBarPressed = false;
 	static bool scraperPressed = false;
@@ -147,8 +159,8 @@ void opcontrol() {
 				intake.move(127);
 				hoard.set_value(true);
 			} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-				intake.move(-127);
-			} else {
+				intake.move(-110);    // change back
+			} else { 
 				intake.move(0);
 			}
 		}
@@ -165,9 +177,11 @@ void opcontrol() {
 				armTimer = pros::millis();
 				armState = ARM_PRIMING;
 			} else if (armState == ARM_PRIMING && pros::millis() - armTimer >= 50) {
+				intake.move(127);
 				arm.move(127);
 				armState = ARM_UP;
 			} else if (armState == ARM_UP) {
+				intake.move(127);
 				arm.move(127);
 			}
 		} else {
@@ -176,19 +190,39 @@ void opcontrol() {
 				armTimer = pros::millis();
 				armState = ARM_RETRACTING;
 			} else if (armState == ARM_RETRACTING) {
-				if (pros::millis() - armTimer >= 350) {
+				if (pros::millis() - armTimer >= 550) {
 					arm.move(0);
 					armState = ARM_IDLE;
 				}
-			} else {
+			} 
+			
+			else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)) {
+				hoard.set_value(false);
+				pros::delay(50);
+				intake.move(127);
+				pros::delay(100);
+				arm.move(80);
+	
+			}
+			else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
+				
+				hoard.set_value(false);
+				intake.move(127);
+			}else {
 				arm.move(0);
 			}
 		}
+		
 
 		// === PNEUMATIC TOGGLES ===
-		// A: Toggle fourBar
-		// Wings up by default, down while R2 is held
-		wing.set_value(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2));
+		// Wing behavior swaps based on fourBar state
+		// FourBar up: wing off by default, hold R2 to activate
+		// FourBar down: wing on by default, hold R2 to deactivate
+		if (fourBarPressed) {
+			wing.set_value(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2));
+		} else {
+			wing.set_value(!master.get_digital(pros::E_CONTROLLER_DIGITAL_R2));
+		}
 
 
 		// B: Toggle scraper
@@ -201,16 +235,15 @@ void opcontrol() {
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
 			fourBarPressed = !fourBarPressed;
 			fourBar.set_value((fourBarPressed));
+			
 		}
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
 			fourBarPressed = !fourBarPressed;
 			fourBar.set_value((fourBarPressed));
 		}
 		// Y: Toggle hoard
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-			hoardPressed = !hoardPressed;
-			hoard.set_value(hoardPressed);
-		}
+		
+		
 
 		pros::delay(20);
 	}

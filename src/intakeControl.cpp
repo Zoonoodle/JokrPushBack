@@ -108,7 +108,7 @@ bool intakeUnjamming = false;
 
 void intakeUnjamTask() {
     int stallCount = 0;
-    const int STALL_CHECKS = 2; // 4 * 50 ms = 200 ms of stall before unjam
+    const int STALL_CHECKS = 4; // 4 * 50 ms = 200 ms of stall before unjam
 
     while (true) {
         double voltage  = intake.get_voltage();
@@ -130,6 +130,6 @@ void intakeUnjamTask() {
             stallCount = 0;
         }
 
-        pros::delay(20);
+        pros::delay(50);
     }
 }

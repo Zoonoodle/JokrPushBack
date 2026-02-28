@@ -30,7 +30,7 @@ pros::MotorGroup left_motors({-11, -14, -1}, pros::MotorGearset::blue);
 pros::MotorGroup right_motors({19, 7, 10}, pros::MotorGearset::blue);
 
 pros::Motor intake(-3, pros::MotorGearset::blue);
-pros::Motor arm(-9, pros::MotorGearset::red);
+pros::Motor arm(9, pros::MotorGearset::green);
 
 lemlib::TrackingWheel vertical(&vertical_encoder, lemlib::Omniwheel::NEW_2, 0); // Adjust this offset based on your robot's geometry
 
@@ -41,11 +41,11 @@ pros::adi::DigitalOut intakeLift('C');   // intake lift
 pros::adi::DigitalOut wing('A');     // odom lift
 pros::adi::DigitalOut hoard('B');        // hoard
 
-lemlib::ControllerSettings angular(2.9  , // proportional gain (kP)
+lemlib::ControllerSettings angular(2.55  , // proportional gain (kP)
                                               0, // integral gain (kI)
-                                              22, // derivative gain (kD)
+                                              26, // derivative gain (kD)
                                               0, // anti windup
-                                              1, // small error range, in inches
+                                              0.75, // small error range, in inches
                                               150, // small error range timeout, in milliseconds
                                               4, // large error range, in inches
                                               700, // large error range timeout, in milliseconds
