@@ -1,4 +1,4 @@
-bin/skills.cpp.o: src/skills.cpp include/autons.h \
+bin/skills.cpp.o: src/skills.cpp include/autons.h include/fmt/core.h \
  include/lemlib/chassis/chassis.hpp include/pros/rtos.hpp \
  include/pros/rtos.h include/pros/imu.hpp include/pros/device.hpp \
  include/pros/misc.hpp include/pros/misc.h include/pros/imu.h \
@@ -9,6 +9,7 @@ bin/skills.cpp.o: src/skills.cpp include/autons.h \
  include/pros/rotation.hpp include/pros/rotation.h \
  include/lemlib/pose.hpp include/lemlib/pid.hpp \
  include/lemlib/exitcondition.hpp include/lemlib/driveCurve.hpp \
+ include/movement.h include/pros/distance.hpp include/pros/distance.h \
  include/robotConfigs.h include/main.h include/api.h include/pros/adi.h \
  include/pros/ai_vision.h include/pros/colors.h include/pros/device.h \
  include/pros/distance.h include/pros/error.h include/pros/ext_adi.h \
@@ -663,8 +664,7 @@ bin/skills.cpp.o: src/skills.cpp include/autons.h \
  include/pros/error.h include/pros/rotation.h include/pros/rtos.h \
  include/pros/screen.h include/pros/colors.h include/pros/vision.h \
  include/pros/adi.hpp include/pros/ai_vision.hpp include/pros/ai_vision.h \
- include/pros/colors.hpp include/pros/device.hpp \
- include/pros/distance.hpp include/pros/distance.h include/pros/gps.hpp \
+ include/pros/colors.hpp include/pros/device.hpp include/pros/gps.hpp \
  include/pros/gps.h include/pros/imu.hpp include/pros/link.hpp \
  include/pros/link.h include/pros/llemu.hpp include/liblvgl/llemu.hpp \
  include/pros/misc.hpp include/pros/motor_group.hpp \
@@ -672,12 +672,12 @@ bin/skills.cpp.o: src/skills.cpp include/autons.h \
  include/pros/rotation.hpp include/pros/rtos.hpp include/pros/screen.hpp \
  include/pros/screen.h include/pros/vision.hpp include/pros/vision.h \
  include/movement.h include/lemlib/api.hpp include/lemlib/util.hpp \
- include/lemlib/logger/logger.hpp include/fmt/core.h include/fmt/format.h \
- include/fmt/core.h include/fmt/format-inl.h \
- include/lemlib/logger/baseSink.hpp include/fmt/args.h \
- include/lemlib/logger/message.hpp include/lemlib/logger/infoSink.hpp \
+ include/lemlib/logger/logger.hpp include/lemlib/logger/baseSink.hpp \
+ include/fmt/args.h include/fmt/core.h include/lemlib/logger/message.hpp \
+ include/lemlib/logger/infoSink.hpp \
  include/lemlib/logger/telemetrySink.hpp include/intakeControl.h
 include/autons.h:
+include/fmt/core.h:
 include/lemlib/chassis/chassis.hpp:
 include/pros/rtos.hpp:
 include/pros/rtos.h:
@@ -702,6 +702,9 @@ include/lemlib/pose.hpp:
 include/lemlib/pid.hpp:
 include/lemlib/exitcondition.hpp:
 include/lemlib/driveCurve.hpp:
+include/movement.h:
+include/pros/distance.hpp:
+include/pros/distance.h:
 include/robotConfigs.h:
 include/main.h:
 include/api.h:
@@ -1408,8 +1411,6 @@ include/pros/ai_vision.hpp:
 include/pros/ai_vision.h:
 include/pros/colors.hpp:
 include/pros/device.hpp:
-include/pros/distance.hpp:
-include/pros/distance.h:
 include/pros/gps.hpp:
 include/pros/gps.h:
 include/pros/imu.hpp:
@@ -1432,12 +1433,9 @@ include/movement.h:
 include/lemlib/api.hpp:
 include/lemlib/util.hpp:
 include/lemlib/logger/logger.hpp:
-include/fmt/core.h:
-include/fmt/format.h:
-include/fmt/core.h:
-include/fmt/format-inl.h:
 include/lemlib/logger/baseSink.hpp:
 include/fmt/args.h:
+include/fmt/core.h:
 include/lemlib/logger/message.hpp:
 include/lemlib/logger/infoSink.hpp:
 include/lemlib/logger/telemetrySink.hpp:

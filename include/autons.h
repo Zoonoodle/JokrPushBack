@@ -8,6 +8,8 @@ void SigSawp15Ball();
 void SigSawp();
 void skillsOwen();
 void skills();
+void sixBallRight();
+void fourBallRight();
 void riskySkills();
 void sevenBall();
 void antiVitalityAuto();
@@ -15,5 +17,6 @@ void lateMidSawp();
 void leftSideNineBall();
 void leftSide4ball();
 void Low54();
+void High54();
 
 #endif

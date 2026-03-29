@@ -3,6 +3,8 @@
 
 #include "main.h"
 #include "lemlib/api.hpp"
+#include "pros/adi.hpp"
+#include "pros/motor_group.hpp"
 #include "pros/rotation.hpp"
 
 //dt stuff
@@ -27,11 +29,15 @@ extern double distSensorOffsets[4]; //front, left, back, right offsets in inches
 
 //tracking stuff
 extern pros::Rotation vertical_encoder;
+extern pros::Rotation horizontal_encoder;
 extern pros::Imu imu;
 extern lemlib::TrackingWheel vertical;
+extern lemlib::TrackingWheel horizontal;
 extern lemlib::OdomSensors sensors;
 
 // Pneumatics (5 total)
+extern pros::adi::DigitalOut pto;
+extern pros::MotorGroup sharedMotors;
 extern pros::adi::DigitalOut fourBar;
 extern pros::adi::DigitalOut scraper;
 extern pros::adi::DigitalOut intakeLift;

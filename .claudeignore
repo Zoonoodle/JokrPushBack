@@ -1,0 +1,22 @@
+# Build artifacts
+bin/
+*.o
+*.elf
+
+# Precompiled firmware/libraries
+firmware/
+
+# Auto-generated dependency files
+.d/
+.cache/
+
+# Third-party library headers (not your robot code)
+include/liblvgl/
+
+# Git internals
+.git/
+
+# Generated/config files
+compile_commands.json
+project.pros
+firebase-debug.log
