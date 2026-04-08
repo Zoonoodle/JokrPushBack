@@ -1,6 +1,7 @@
 #include "main.h"
 #include "lemlib/api.hpp"
 #include "autons.h"
+#include "liblvgl/core/lv_obj_class.h"
 #include "movement.h"
 #include "pros/abstract_motor.hpp"
 #include "pros/misc.h"
@@ -38,11 +39,10 @@ void on_center_button() {
 void initialize() {
 	
     pros::lcd::initialize(); // initialize brain screen
-    armRot.reset();
-	arm.tare_position(); // zero the arm IME for armTo() position control
+	// arm.tare_position(); // zero the arm IME for armTo() position control
 	scraper.set_value(true);
-	wing.set_value(true);
-	hoard.set_value(true);
+	// wing.s et_value(true);
+	// hoard.set_value(false);
 	// fourBar.set_value(true);
     chassis.calibrate();// calibrate sensors
 
@@ -62,7 +62,7 @@ void initialize() {
 			pros::lcd::print(4, "Back: %.2f", (float) backDist.get());
 			pros::lcd::print(4, "left: %.2f", (float) leftDist.get());
 			pros::lcd::print(4, "right: %.2f", (float) rightDist.get());
-			pros::lcd::print(5, "Arm IME: %.2f", (float) arm.get_position()); // degrees from motor encoder
+			// pros::lcd::print(5, "Arm IME: %.2f", (float) arm.get_position()); // degrees from motor encoder
 			pros::lcd::print(6, "Intake Vel: %.2f", (float) intake.get_actual_velocity());
             pros::delay(50);
         }
@@ -105,6 +105,8 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
+	chassis.moveToPoint(0, 24, 1000);
+chassis.moveToPoint(0, 0, 1000, {.forwards = false});
 	// fourBallRight();
 	// sixBallRight();
 	// riskySkills();
@@ -113,7 +115,7 @@ void autonomous() {
 	// antiVitalityAuto();
 	// chassis.moveToPoint(0, 61, 5000, {.maxSpeed = 50, .minSpeed = 50});
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-	 elimsMidRush();
+	//  elimsMidRush();
 // chassis.turnToHeading(180, 1000);
 // chassis.waitUntilDone();
 // chassis.turnToHeading(0, 1000);
@@ -162,9 +164,15 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	static bool fourBarPressed = false;
+	static int fourBarState = 1; // 0 = DOWN (intakeLift), 1 = UP (fourBar false), 2 = NEUTRAL (fourBar true)
 	static bool scraperPressed = false;
-double ptoPressed = false;
+	static bool l1WasHeld = false;
+	double ptoPressed = false;
+
+	// Non-blocking L1 release state machine
+	// 0 = idle, 1 = motors reversing (wait 300ms), 2 = PTO shifted (wait 100ms)
+	int l1ReleaseState = 0;
+	uint32_t l1ReleaseTimer = 0;
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 	sharedMotors.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -180,98 +188,51 @@ double ptoPressed = false;
 		// === DRIVETRAIN ===
 		int leftY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int rightX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-		chassis.arcade(leftY, rightX * 0.65, true, 0.7);
+		chassis.arcade(leftY, rightX * 0.679, true, 0.7);
 
-	// 	// === PTO SHARED MOTOR CONTROL ===
-	// 	bool armRequested = master.get_digital(pros::E_CONTROLLER_DIGITAL_L1) ||
-	// 	                    master.get_digital(pros::E_CONTROLLER_DIGITAL_B);
-	// 	int armSpeed = master.get_digital(pros::E_CONTROLLER_DIGITAL_L1) ? 120 : 70;
+bool l1Held = master.get_digital(pros::E_CONTROLLER_DIGITAL_L1);
 
-	// 	switch (ptoState) {
-	// 		case PTO_INTAKE:
-	// 			if (armRequested) {
-	// 				// Shift PTO to arm, reverse briefly to engage
-	// 				pto.set_value(false);
-	// 				sharedMotors.move(-127);
-	// 				ptoTimer = pros::millis();
-	// 				ptoState = PTO_ARM_ENGAGING;
-	// 				hoard.set_value(false);
-	// 			} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-	// 				pto.set_value(true);
-	// 				sharedMotors.move(127);
-	// 				hoard.set_value(true);
-	// 			} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-	// 				pto.set_value(true);
-	// 				sharedMotors.move(-90);
-	// 			} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
-	// 				hoard.set_value(false);
-	// 				sharedMotors.move(127);
-	// 			} else {
-	// 				sharedMotors.move(0);
-	// 			}
-	// 			break;
-
-	// 		case PTO_ARM_ENGAGING:
-	// 			// Wait for PTO gear to engage
-	// 			if (!armRequested) {
-	// 				// Released early — go straight to retract
-	// 				sharedMotors.move(-127);
-	// 				ptoTimer = pros::millis();
-	// 				ptoState = PTO_ARM_RETRACTING;
-	// 			} else if (pros::millis() - ptoTimer >= 200) {
-	// 				sharedMotors.move(armSpeed);
-	// 				ptoState = PTO_ARM_UP;
-	// 			}
-	// 			break;
-
-	// 		case PTO_ARM_UP:
-	// 			if (armRequested) {
-	// 				sharedMotors.move(armSpeed);
-	// 			} else {
-	// 				pto.set_value(false);
-	// 				// Released — retract arm back down
-	// 				sharedMotors.move(-127);
-	// 				ptoTimer = pros::millis();
-	// 				ptoState = PTO_ARM_RETRACTING;
-	// 			}
-	// 			break;
-
-	// 		case PTO_ARM_RETRACTING:
-	// 			// Let arm fully retract before switching back to intake
-	// 			if (pros::millis() - ptoTimer >= 400) {
-	// 				sharedMotors.move(0);
-	// 				pto.set_value(true); // shift back to intake
-	// 				ptoState = PTO_INTAKE;
-	// 			}
-// 	// 			break;
-// 	// 	}
-
-if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+// Handle L1 release sequence non-blocking
+if (l1ReleaseState == 1 && pros::millis() - l1ReleaseTimer >= 300) {
 	pto.set_value(true);
-	sharedMotors.move(-127);
+	l1ReleaseTimer = pros::millis();
+	l1ReleaseState = 2;
 }
-else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-		// sharedMotors.move(-127);
-		pto.set_value(false);
-		// pros::delay(500);
-		sharedMotors.move(127);
-	}
-else if (master.get_digital_new_release(pros::E_CONTROLLER_DIGITAL_L1)) {
-	// sharedMotors.move(0);
-	pto.set_value(false);
-	sharedMotors.move(-127);
-	pros::delay(400);
-}
-else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-	// sharedMotors.move(-120);
-	pto.set_value(true);
-	// pros::delay(200);
-	sharedMotors.move(80);
-
-}
-else {
-	
+else if (l1ReleaseState == 2 && pros::millis() - l1ReleaseTimer >= 100) {
 	sharedMotors.move(0);
+	l1ReleaseState = 0;
+}
+
+if (l1ReleaseState == 0) {
+	if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+		hoard.set_value(false);
+		grab();
+		l1WasHeld = false;
+	}
+	else if (l1Held) {
+		if (!l1WasHeld) {
+			// first press — shift PTO then ease motors in
+			l1WasHeld = true;
+			hoard.set_value(true);
+			pto.set_value(false);
+			sharedMotors.move(-127);
+		} else {
+			sharedMotors.move(-127);
+		}
+	}
+	else if (!l1Held && l1WasHeld) {
+		// L1 just released — start non-blocking retract sequence
+		sharedMotors.move(127);
+		l1ReleaseTimer = pros::millis();
+		l1ReleaseState = 1;
+		l1WasHeld = false;
+	}
+	else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+		extake();
+	}
+	else {
+		rest();
+	}
 }
 
 
@@ -279,7 +240,7 @@ else {
 
 
 		// === PNEUMATIC TOGGLES ===
-		if (fourBarPressed) {
+		if (fourBarState == 2) {
 			wing.set_value(!master.get_digital(pros::E_CONTROLLER_DIGITAL_R2));
 		} else {
 			wing.set_value(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2));
@@ -291,8 +252,20 @@ else {
 		}
 
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
-			fourBarPressed = !fourBarPressed;
-			fourBar.set_value(fourBarPressed);
+			fourBarState = (fourBarState + 1) % 3;
+			if (fourBarState == 0) {
+				// DOWN: intakeLift engages
+				intakeLift.set_value(true);
+				fourBar.set_value(false);
+			} else if (fourBarState == 1) {
+				// UP: intakeLift off, fourBar false
+				intakeLift.set_value(false);
+				fourBar.set_value(false);
+			} else {
+				// NEUTRAL: intakeLift off, fourBar true
+				intakeLift.set_value(false);
+				fourBar.set_value(true);
+			}
 		}
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
 		

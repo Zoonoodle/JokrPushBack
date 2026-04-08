@@ -1,6 +1,7 @@
 #ifndef _PROS_ROBOT_CONFIGS_H_
 #define _PROS_ROBOT_CONFIGS_H_
 
+#include "intakeControl.h"
 #include "main.h"
 #include "lemlib/api.hpp"
 #include "pros/adi.hpp"
@@ -14,10 +15,8 @@ extern lemlib::Drivetrain drivetrain;
 extern lemlib::Chassis chassis;
 extern lemlib::Chassis noOdomChassis;
 
-// Intake and Arm
 extern pros::Motor intake;
-extern pros::Motor arm;
-extern pros::Rotation armRot;
+
 
 // Distance sensors
 extern pros::Distance rightDist;

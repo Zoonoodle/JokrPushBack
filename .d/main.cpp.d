@@ -677,7 +677,8 @@ bin/main.cpp.o: src/main.cpp include/main.h include/api.h \
  include/fmt/args.h include/lemlib/logger/message.hpp \
  include/lemlib/logger/infoSink.hpp \
  include/lemlib/logger/telemetrySink.hpp include/autons.h \
- include/movement.h include/robotConfigs.h include/main.h \
+ include/liblvgl/core/lv_obj_class.h include/movement.h \
+ include/robotConfigs.h include/intakeControl.h include/main.h \
  include/intakeControl.h
 include/main.h:
 include/api.h:
@@ -1442,7 +1443,9 @@ include/lemlib/logger/message.hpp:
 include/lemlib/logger/infoSink.hpp:
 include/lemlib/logger/telemetrySink.hpp:
 include/autons.h:
+include/liblvgl/core/lv_obj_class.h:
 include/movement.h:
 include/robotConfigs.h:
+include/intakeControl.h:
 include/main.h:
 include/intakeControl.h:

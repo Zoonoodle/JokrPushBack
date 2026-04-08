@@ -11,17 +11,13 @@
 #include "pros/rotation.hpp"
 
 pros::Rotation horizontal_encoder(7);
-pros::Rotation vertical_encoder(-9);
-pros::Imu imu(8);
+pros::Rotation vertical_encoder(9);
+pros::Imu imu(7);
 
 pros::Distance rightDist(6);
 pros::Distance leftDist(5);
 pros::Distance backDist(4);
 pros::Distance frontDist(3);
-
-
-// Rotation sensor (may not be physically present — kept for compilation)
-pros::Rotation armRot(-15);
 
 
 
@@ -31,8 +27,8 @@ double distSensorOffsets[4] = {5, 2, 1, 2};
 
 //motors
 pros::MotorGroup left_motors({-21, -16, -14}, pros::MotorGearset::blue);
-pros::MotorGroup right_motors({10, 2, 13}, pros::MotorGearset::blue);
-pros::MotorGroup sharedMotors({12, -11}, pros::MotorGearset::green);
+pros::MotorGroup right_motors({10, 15, 13}, pros::MotorGearset::blue);
+pros::MotorGroup sharedMotors({-12, 11}, pros::MotorGearset::green);
 
 // Stub motors on the same ports as sharedMotors — only here so autons/skills compile.
 // Opcontrol uses sharedMotors + pto instead.
@@ -49,24 +45,24 @@ pros::adi::DigitalOut wing('A');     // odom lift
 pros::adi::DigitalOut hoard('F');        // hoard
 pros::adi::DigitalOut pto('D');
 
-lemlib::ControllerSettings angular(2.4  , // proportional gain (kP)
+lemlib::ControllerSettings angular(2  , // proportional gain (kP)
                                               0, // integral gain (kI)
-                                              23, // derivative gain (kD)
+                                              22, // derivative gain (kD)
                                               0, // anti windup
-                                              1, // small error range, in inches
-                                              150, // small error range timeout, in milliseconds
-                                              4, // large error range, in inches
-                                              700, // large error range timeout, in milliseconds
+                                              .5, // small error range, in inches
+                                              100, // small error range timeout, in milliseconds
+                                              6, // large error range, in inches
+                                              600, // large error range timeout, in milliseconds
                                               0 // maximum acceleration (slew)
 );
-lemlib::ControllerSettings lateral(7, // proportional gain (kP)
+lemlib::ControllerSettings lateral(6, // proportional gain (kP)
                                               0, // integral gain (kI)
-                                              24, // derivative gain (kD)
+                                              18, // derivative gain (kD)
                                               0, // anti windup
-                                              1.55, // small error range, in inches
-                                              150, // small error range timeout, in milliseconds
-                                              4.1, // large error range, in inches
-                                              700, // large error range timeout, in milliseconds
+                                              1, // small error range, in inches
+                                              100, // small error range timeout, in milliseconds
+                                              4, // large error range, in inches
+                                              500, // large error range timeout, in milliseconds
                                               0 // maximum acceleration (slew)
 );
 
